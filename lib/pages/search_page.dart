@@ -237,7 +237,6 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       onTap: () {
-                        // TODO: navigation
                         if (song.type == "PLAYLIST") {
                           Navigator.push(
                             context,

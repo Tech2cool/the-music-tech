@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/pages/album_info_page.dart';
+import 'package:the_music_tech/pages/artist_info_page.dart';
+import 'package:the_music_tech/pages/music_player_page.dart';
 
 class PlayListInfoPage extends StatefulWidget {
   final SearchModel music;
@@ -22,10 +25,7 @@ class _PlayListInfoPageState extends State<PlayListInfoPage> {
   }
 
   fetchPlayList() async {
-    final myProvider = Provider.of<MyProvider>(
-      context,
-      listen: false,
-    );
+    final myProvider = Provider.of<MyProvider>(context, listen: false);
     try {
       setState(() {
         isLoading = true;
@@ -47,18 +47,13 @@ class _PlayListInfoPageState extends State<PlayListInfoPage> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(
-            title: const Text("Playlist"),
-          ),
+          appBar: AppBar(title: const Text("Playlist")),
           body: ListView(
             children: [
               if (widget.music.thumbnails.isNotEmpty) ...[
                 CarouselSlider.builder(
                   itemCount: widget.music.thumbnails.length,
-                  options: CarouselOptions(
-                    aspectRatio: 9 / 5,
-                    autoPlay: true,
-                  ),
+                  options: CarouselOptions(aspectRatio: 9 / 5, autoPlay: true),
                   itemBuilder: (
                     BuildContext context,
                     int itemIndex,
@@ -105,103 +100,84 @@ class _PlayListInfoPageState extends State<PlayListInfoPage> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Divider(
-                color: Colors.grey.withOpacity(0.3),
-              ),
+              Divider(color: Colors.grey.withOpacity(0.3)),
               if (playlist.isNotEmpty)
-                ...List.generate(
-                  playlist.length,
-                  (index) {
-                    final song = playlist[index];
-                    return ListTile(
-                      minVerticalPadding: 10,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 15,
+                ...List.generate(playlist.length, (index) {
+                  final song = playlist[index];
+                  return ListTile(
+                    minVerticalPadding: 10,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 15,
+                    ),
+                    title: Text(
+                      song.name ?? "NA",
+                      maxLines: 2,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    subtitle: Text(
+                      maxLines: 1,
+                      song.album?.name ?? song.artist?.name ?? "NA",
+                    ),
+                    leading: SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: CachedNetworkImage(
+                        imageUrl: (song.thumbnails.isNotEmpty
+                            ? song.thumbnails.length > 1
+                                ? song.thumbnails[1].url ?? ""
+                                : song.thumbnails[0].url ?? ""
+                            : "https://static-00.iconduck.com/assets.00/no-image-icon-512x512-lfoanl0w.png"),
+                        errorWidget: (context, error, stackTrace) =>
+                            const Icon(Icons.image_not_supported),
                       ),
-                      title: Text(
-                        song.name ?? "NA",
-                        maxLines: 2,
-                        style: const TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                      subtitle: Text(
-                        maxLines: 1,
-                        song.album?.name ?? song.artist?.name ?? "NA",
-                      ),
-                      leading: SizedBox(
-                        width: 80,
-                        height: 80,
-                        child: CachedNetworkImage(
-                          imageUrl: (song.thumbnails.isNotEmpty
-                              ? song.thumbnails.length > 1
-                                  ? song.thumbnails[1].url ?? ""
-                                  : song.thumbnails[0].url ?? ""
-                              : "https://static-00.iconduck.com/assets.00/no-image-icon-512x512-lfoanl0w.png"),
-                          errorWidget: (context, error, stackTrace) =>
-                              const Icon(Icons.image_not_supported),
-                        ),
-                      ),
-                      trailing: const Icon(
-                        Icons.play_circle_fill_rounded,
-                        size: 40,
-                      ),
-                      onTap: () {
-                        //  TODO: navigation
-                        // if (song.type == "PLAYLIST") {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => PlayListInfoPage(
-                        //         music: song,
-                        //       ),
-                        //     ),
-                        //   );
-                        // } else if (song.type == "ARTIST") {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => ArtistInfoPage(
-                        //         music: song,
-                        //       ),
-                        //     ),
-                        //   );
-                        // } else if (song.type == "ALBUM") {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => AlbumInfoPage(
-                        //         music: song,
-                        //       ),
-                        //     ),
-                        //   );
-                        // } else {
-                        //   myProvider.playlist = playlist;
-                        //   myProvider.currentIndex = index;
+                    ),
+                    trailing: const Icon(
+                      Icons.play_circle_fill_rounded,
+                      size: 40,
+                    ),
+                    onTap: () {
+                      if (song.type == "PLAYLIST") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PlayListInfoPage(music: song),
+                          ),
+                        );
+                      } else if (song.type == "ARTIST") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ArtistInfoPage(music: song),
+                          ),
+                        );
+                      } else if (song.type == "ALBUM") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AlbumInfoPage(music: song),
+                          ),
+                        );
+                      } else {
+                        myProvider.playlist = playlist;
+                        myProvider.currentIndex = index;
 
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => MusicPlayerPage(
-                        //         music: song,
-                        //       ),
-                        //     ),
-                        //   );
-                        // }
-                      },
-                    );
-                  },
-                )
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MusicPlayerPage(music: song),
+                          ),
+                        );
+                      }
+                    },
+                  );
+                })
               else ...[
                 const Text(
                   "Playlist is Empty",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                )
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                ),
               ],
             ],
           ),
@@ -209,10 +185,8 @@ class _PlayListInfoPageState extends State<PlayListInfoPage> {
         if (isLoading)
           Container(
             color: Colors.black.withOpacity(0.3),
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
+            child: const Center(child: CircularProgressIndicator()),
+          ),
       ],
     );
   }

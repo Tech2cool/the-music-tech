@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/pages/playlist_info_page.dart';
 
 class MyPlaylistPage extends StatelessWidget {
   const MyPlaylistPage({super.key});
@@ -75,15 +76,14 @@ class MyPlaylistPage extends StatelessWidget {
                 ],
               ),
               onTap: () {
-                // TODO: navigation
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => PlayListInfoPage(
-                //       music: currentPlaylist,
-                //     ),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PlayListInfoPage(
+                      music: currentPlaylist,
+                    ),
+                  ),
+                );
               },
             ),
           ] else

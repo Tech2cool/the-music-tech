@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/pages/album_info_page.dart';
+import 'package:the_music_tech/pages/music_player_page.dart';
+import 'package:the_music_tech/pages/playlist_info_page.dart';
 
 class ArtistInfoPage extends StatefulWidget {
   final SearchModel music;
@@ -204,47 +207,46 @@ class TopSongsTab extends StatelessWidget {
                     size: 40,
                   ),
                   onTap: () {
-                    // TODO:navigation
-                    // if (song.type == "PLAYLIST") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => PlayListInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else if (song.type == "ARTIST") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => ArtistInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else if (song.type == "ALBUM") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => AlbumInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else {
-                    //   myProvider.playlist = artistInfo.topSongs;
-                    //   myProvider.currentIndex = index;
+                    if (song.type == "PLAYLIST") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayListInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else if (song.type == "ARTIST") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ArtistInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else if (song.type == "ALBUM") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AlbumInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else {
+                      myProvider.playlist = artistInfo.topSongs;
+                      myProvider.currentIndex = index;
 
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => MusicPlayerPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MusicPlayerPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    }
                   },
                 );
               },
@@ -315,35 +317,34 @@ class TopAlbumsTab extends StatelessWidget {
                     size: 40,
                   ),
                   onTap: () {
-                    // TODO: navigation
-                    // if (song.type == "PLAYLIST") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => PlayListInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else if (song.type == "ALBUM") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => AlbumInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => MusicPlayerPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // }
+                    if (song.type == "PLAYLIST") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayListInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else if (song.type == "ALBUM") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AlbumInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MusicPlayerPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    }
                   },
                 );
               },
@@ -415,35 +416,34 @@ class TopMix extends StatelessWidget {
                     size: 40,
                   ),
                   onTap: () {
-                    // TODO: navigation
-                    // if (song.type == "PLAYLIST") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => PlayListInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else if (song.type == "ALBUM") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => AlbumInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => MusicPlayerPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // }
+                    if (song.type == "PLAYLIST") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayListInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else if (song.type == "ALBUM") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AlbumInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MusicPlayerPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    }
                   },
                 );
               },
@@ -514,35 +514,34 @@ class FeaturedTab extends StatelessWidget {
                     size: 40,
                   ),
                   onTap: () {
-                    // TODO: navigation
-                    // if (song.type == "PLAYLIST") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => PlayListInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else if (song.type == "ALBUM") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => AlbumInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => MusicPlayerPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // }
+                    if (song.type == "PLAYLIST") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayListInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else if (song.type == "ALBUM") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AlbumInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MusicPlayerPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    }
                   },
                 );
               },
@@ -613,35 +612,34 @@ class SimilarArtistTab extends StatelessWidget {
                     size: 40,
                   ),
                   onTap: () {
-                    // TODO: navigation
-                    // if (song.type == "PLAYLIST") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => PlayListInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else if (song.type == "ALBUM") {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => AlbumInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // } else {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => ArtistInfoPage(
-                    //         music: song,
-                    //       ),
-                    //     ),
-                    //   );
-                    // }
+                    if (song.type == "PLAYLIST") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayListInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else if (song.type == "ALBUM") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AlbumInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ArtistInfoPage(
+                            music: song,
+                          ),
+                        ),
+                      );
+                    }
                   },
                 );
               },
