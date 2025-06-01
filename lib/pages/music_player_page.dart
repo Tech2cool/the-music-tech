@@ -133,8 +133,20 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                     // }
                   } else {
                     final foundList = myProvider.myPlayList;
-                    final list = [...foundList, newMedia];
-                    final savedList = list.map((ele) => ele?.toMap()).toList();
+                    if (newMedia != null) {
+                      if (context.mounted) {
+                        toastification.show(
+                          context: context,
+                          title: Text('Something went wrong'),
+                          autoCloseDuration: const Duration(seconds: 3),
+                          type: ToastificationType.error,
+                        );
+                      }
+                      return;
+                    }
+                    final list = [...foundList, newMedia!];
+                    final savedList = list.map((ele) => ele.toMap()).toList();
+                    myProvider.updateMyList(list);
 
                     await SharedPrefService.storeJsonArray(
                       "play_list",
@@ -148,7 +160,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                     //   );
                     // }
                   }
-                  await myProvider.getMyPlayList();
+                  myProvider.getMyPlayList();
                 },
                 icon: Icon(
                   FluentIcons.heart_12_filled,

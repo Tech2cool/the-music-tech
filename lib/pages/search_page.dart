@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/components/skeleton_horizontal.dart';
@@ -104,6 +106,7 @@ class _SearchPageState extends State<SearchPage> {
         child: Text("Playlist"),
       ),
     ];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -187,6 +190,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             if (isLoading) ...[
+              SizedBox(height: 10),
               Expanded(
                 child: SkeletonHorizontal(isLoading: isLoading, length: 5),
               ),
@@ -196,11 +200,16 @@ class _SearchPageState extends State<SearchPage> {
                   itemCount: searchResult.length,
                   itemBuilder: (context, index) {
                     final song = searchResult[index];
+                    final isLikedMusic = myProvider.myPlayList
+                        .firstWhereOrNull((ele) => ele.videoId == song.videoId);
+
                     return ListTile(
                       minVerticalPadding: 10,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 5,
+                      contentPadding: EdgeInsets.only(
+                        top: 10,
+                        bottom: index == searchResult.length - 1 ? 80 : 10,
+                        left: 5,
+                        right: 5,
                       ),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -248,24 +257,51 @@ class _SearchPageState extends State<SearchPage> {
                             if (song.type == 'SONG' || song.type == 'VIDEO')
                               PopupMenuItem(
                                 onTap: () async {
-                                  final foundList =
-                                      await myProvider.getMyPlayList();
-                                  final list = [...foundList, song];
-                                  final savedList =
-                                      list.map((ele) => ele.toMap()).toList();
+                                  if (isLikedMusic != null) {
+                                    final newList = myProvider.myPlayList
+                                        .where((ele) =>
+                                            ele.videoId != song.videoId)
+                                        .toList();
 
-                                  await SharedPrefService.storeJsonArray(
-                                    "play_list",
-                                    savedList,
-                                  );
-                                  if (context.mounted) {
-                                    toastification.show(
-                                      context: context,
-                                      title: Text('Added to playlist'),
-                                      autoCloseDuration:
-                                          const Duration(seconds: 5),
+                                    final updatedlist = newList
+                                        .map((ele) => ele.toMap())
+                                        .toList();
+
+                                    myProvider.updateMyList(newList);
+
+                                    await SharedPrefService.storeJsonArray(
+                                      "play_list",
+                                      updatedlist,
                                     );
+                                    // if (context.mounted) {
+                                    //   toastification.show(
+                                    //     context: context,
+                                    //     title: Text('Remove from playlist'),
+                                    //     autoCloseDuration: const Duration(seconds: 5),
+                                    //   );
+                                    // }
+                                  } else {
+                                    final foundList = myProvider.myPlayList;
+                                    final list = [...foundList, song];
+                                    final savedList =
+                                        list.map((ele) => ele.toMap()).toList();
+
+                                    myProvider.updateMyList(list);
+
+                                    await SharedPrefService.storeJsonArray(
+                                      "play_list",
+                                      savedList,
+                                    );
+                                    if (context.mounted) {
+                                      toastification.show(
+                                        context: context,
+                                        title: Text('added to playlist'),
+                                        autoCloseDuration:
+                                            const Duration(seconds: 5),
+                                      );
+                                    }
                                   }
+                                  myProvider.getMyPlayList();
                                 },
                                 child: Text("Add To Playlist"),
                               ),
@@ -317,11 +353,6 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
               ),
-            SafeArea(
-              child: SizedBox(
-                height: 80,
-              ),
-            ),
           ],
         ),
       ),
