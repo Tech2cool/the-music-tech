@@ -60,6 +60,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
         },
         unselectedItemColor: Colors.grey,
         selectedItemColor: Colors.orange,
+        type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
         showSelectedLabels: true,
         items: _items,

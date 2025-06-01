@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                   }),
                   SafeArea(
                     child: SizedBox(
-                      height: 40,
+                      height: 80,
                     ),
                   ),
                 ],

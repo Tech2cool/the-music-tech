@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/components/skeleton_horizontal.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:the_music_tech/pages/album_info_page.dart';
 import 'package:the_music_tech/pages/artist_info_page.dart';
 import 'package:the_music_tech/pages/music_player_page.dart';
 import 'package:the_music_tech/pages/playlist_info_page.dart';
+import 'package:toastification/toastification.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -22,7 +24,7 @@ class _SearchPageState extends State<SearchPage> {
   Timer? _debounce;
   String? selectedFilter = "ALL";
   bool isLoading = false;
-
+  FocusNode focusNode = FocusNode();
   @override
   void initState() {
     super.initState();
@@ -159,6 +161,10 @@ class _SearchPageState extends State<SearchPage> {
             TextField(
               controller: _controller,
               onChanged: _onSearchChanged,
+              focusNode: focusNode,
+              onTapOutside: (event) {
+                focusNode.unfocus();
+              },
               decoration: InputDecoration(
                 hintText: 'Search for music',
                 prefixIcon: const Icon(Icons.search),
@@ -236,6 +242,35 @@ class _SearchPageState extends State<SearchPage> {
                               const Icon(Icons.image_not_supported),
                         ),
                       ),
+                      trailing: PopupMenuButton(
+                        itemBuilder: (context) {
+                          return [
+                            if (song.type == 'SONG' || song.type == 'VIDEO')
+                              PopupMenuItem(
+                                onTap: () async {
+                                  //TODO: add to play list
+                                  final foundList =
+                                      await myProvider.getMyPlayList();
+                                  final list = [...foundList, song];
+                                  final savedList =
+                                      list.map((ele) => ele.toMap()).toList();
+
+                                  await SharedPrefService.storeJsonArray(
+                                    "play_list",
+                                    savedList,
+                                  );
+                                  toastification.show(
+                                    context: context,
+                                    title: Text('Added to playlist'),
+                                    autoCloseDuration:
+                                        const Duration(seconds: 5),
+                                  );
+                                },
+                                child: Text("Add To Playlist"),
+                              ),
+                          ];
+                        },
+                      ),
                       onTap: () {
                         if (song.type == "PLAYLIST") {
                           Navigator.push(
@@ -265,7 +300,7 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                           );
                         } else {
-                          // myProvider.playlist = searchResult;
+                          myProvider.playlist = [];
                           myProvider.currentIndex = index;
                           Navigator.push(
                             context,
@@ -281,6 +316,11 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
               ),
+            SafeArea(
+              child: SizedBox(
+                height: 80,
+              ),
+            ),
           ],
         ),
       ),

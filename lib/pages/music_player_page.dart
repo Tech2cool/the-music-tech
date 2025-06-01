@@ -6,14 +6,15 @@ import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:collection/collection.dart';
 
 class MusicPlayerPage extends StatefulWidget {
-  final SearchModel music;
+  final SearchModel? music;
   final int index;
 
   const MusicPlayerPage({
     super.key,
-    required this.music,
+    this.music,
     this.index = 0,
   });
 
@@ -33,10 +34,13 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
       context,
       listen: false,
     );
-
-    myProvider.currentMedia = widget.music;
+    if (widget.music != null) {
+      myProvider.currentMedia = widget.music;
+    }
     final music = myProvider.currentMedia ?? widget.music;
-    _playAudioFromYouTube(music.videoId ?? "");
+    if (widget.music != null) {
+      _playAudioFromYouTube(music?.videoId ?? "");
+    }
   }
 
   Future<void> _playAudioFromYouTube(String videoId) async {
@@ -50,7 +54,10 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
       //   isLoading = true;
       // });
       final music = myProvider.currentMedia ?? widget.music;
-
+      if (music == null) {
+        print("musc not provided");
+        return;
+      }
       await myProvider.playAudioFromYouTube(videoId, music);
     } catch (e) {
       //
@@ -105,12 +112,16 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
     final music = myProvider.currentMedia ?? widget.music;
     final isLoading = myProvider.isLoading;
     final cItem = audioHandler.mediaItem;
-    final thumbnails = cItem.value?.artUri != null
-        ? [cItem.value?.artUri.toString()]
-        : music.thumbnails.map((ele) => ele.url).toList();
-    final mName = cItem.value?.title ?? music.name;
-    final mArtistName = cItem.value?.artist ?? music.artist?.name;
-    final mAlbumName = cItem.value?.album ?? music.album?.name;
+    final newMedia =
+        playlist.firstWhereOrNull((ele) => ele.videoId == cItem.value?.id);
+
+    final thumbnails = newMedia != null
+        ? newMedia.thumbnails.map((ele) => ele.url).toList()
+        : music?.thumbnails.map((ele) => ele.url).toList() ?? [];
+
+    final mName = newMedia?.name ?? music?.name;
+    final mArtistName = newMedia?.artist?.name ?? music?.artist?.name;
+    final mAlbumName = newMedia?.album?.name ?? music?.album?.name;
 
     return Stack(
       children: [
@@ -212,13 +223,14 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                     IconButton(
                         icon: Icon(
                           Icons.skip_previous_rounded,
-                          color: (audioHandler.player.currentIndex ?? 0) > 1
+                          color: (audioHandler.player.currentIndex ?? 0) > 0
                               ? Colors.white
                               : Colors.grey.shade600,
                           size: 30,
                         ),
                         onPressed: () {
                           audioHandler.skipToPrevious();
+                          setState(() {});
                         } // myProvider.onTapPrev,
                         // onPressed: () {
                         //   if (myProvider.currentIndex <= 0) return;
@@ -255,6 +267,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                             isPlaying
                                 ? audioHandler.pause()
                                 : audioHandler.play();
+                            setState(() {});
                           },
                         );
                       },
@@ -264,13 +277,14 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                         icon: Icon(
                           Icons.skip_next_rounded,
                           color: (audioHandler.player.currentIndex ?? 0) <=
-                                  myProvider.playlist.length
+                                  audioHandler.playlist.length - 1
                               ? Colors.white
                               : Colors.grey.shade600,
                           size: 30,
                         ),
                         onPressed: () {
                           audioHandler.skipToNext();
+                          setState(() {});
                         } //myProvider.onTapNext,
                         // onPressed: () {
                         //   if (myProvider.currentIndex >=

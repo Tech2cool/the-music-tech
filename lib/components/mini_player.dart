@@ -1,7 +1,9 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/pages/music_player_page.dart';
 
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});
@@ -10,21 +12,25 @@ class MiniPlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     final myProvider = Provider.of<MyProvider>(context);
     final mediaItem = myProvider.audioHandler.mediaItem;
+    final playlist = myProvider.playlist;
+
     final audioHandler = myProvider.audioHandler;
+    final newMedia =
+        playlist.firstWhereOrNull((ele) => ele.videoId == mediaItem.value?.id);
 
     return mediaItem.valueOrNull == null
         ? const SizedBox.shrink()
         : GestureDetector(
             onTap: () {
               // TODO: navigation to music
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => MusicPlayerPage(
-              //       music: MyProvider.currentMedia!,
-              //     ),
-              //   ),
-              // );
+              if (newMedia != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MusicPlayerPage(),
+                  ),
+                );
+              }
             },
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),

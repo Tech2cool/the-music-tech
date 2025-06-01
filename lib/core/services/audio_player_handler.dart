@@ -9,7 +9,9 @@ class AudioPlayerHandler extends BaseAudioHandler
   AudioPlayer get player => _player;
 
   // Playlist of audio sources
-  late final List<AudioSource> _playlist;
+  List<AudioSource> _playlist = [];
+
+  // late final List<AudioSource> _playlist;
 
   List<AudioSource> get playlist => _playlist;
 
@@ -50,47 +52,101 @@ class AudioPlayerHandler extends BaseAudioHandler
     queue.add([]);
   }
 
-  // Load playlist of songs
   Future<void> loadPlaylist(List<AudioSource> list) async {
-    _playlist =
-        list; /* [
-      AudioSource.uri(
-        Uri.parse(
-            "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"),
-        tag: MediaItem(
-          id: "1",
-          title: "Kalimba",
-          artist: "Artist 1",
-          artUri: Uri.parse(
-              "https://i.pinimg.com/236x/5c/05/ae/5c05ae623ade949fb687423608f6ba45.jpg"),
-        ),
-      ),
-      AudioSource.uri(
-        Uri.parse("https://www.sample-videos.com/audio/mp3/crowd-cheering.mp3"),
-        tag: MediaItem(
-          id: "2",
-          title: "Crowd Cheering",
-          artist: "Artist 2",
-          artUri: Uri.parse(
-              "https://i.pinimg.com/236x/5c/05/ae/5c05ae623ade949fb687423608f6ba45.jpg"),
-        ),
-      ),
-    ];
-*/
-    await _player.setAudioSources(_playlist);
-
-    // Update queue with media items extracted from playlist
-    queue.add(
-      _playlist
-          .map((source) => (source as ProgressiveAudioSource).tag as MediaItem)
-          .toList(),
-    );
-
-    // Set current mediaItem initially
-    if (_playlist.isNotEmpty) {
-      mediaItem.add((_playlist[0] as ProgressiveAudioSource).tag as MediaItem);
+    if (list.isEmpty) {
+      // print('Empty playlist, skipping');
+      return;
     }
+
+    // print('Stopping player...');
+    await _player.stop();
+
+    // print('Setting internal playlist...');
+    _playlist = list;
+
+    // print('Updating queue...');
+    final items = _playlist
+        .map((source) => (source as ProgressiveAudioSource).tag as MediaItem)
+        .toList();
+    queue.add(items);
+
+    // print('Setting audio sources...');
+    await _player.setAudioSources(_playlist,
+        preload: true, initialIndex: 0, initialPosition: Duration.zero);
+
+    if (_playlist.isNotEmpty) {
+      final firstItem = _playlist[0] as ProgressiveAudioSource;
+      mediaItem.add(firstItem.tag as MediaItem);
+    }
+
+    // print('Seeking to start...');
+    await _player.seek(Duration.zero, index: 0);
+
+    // print('Playing...');
+    await _player.play();
+
+    // print('Playlist loaded and playing.');
   }
+
+  // Future<void> loadPlaylist(List<AudioSource> list) async {
+  //   print('pass 1');
+  //   // Hard stop current playback
+  //   await _player.stop();
+
+  //   print('pass 2');
+  //   // Replace internal playlist
+  //   _playlist = list;
+
+  //   // Update queue before setting source
+  //   print('pass 3');
+  //   final items = _playlist
+  //       .map((source) => (source as ProgressiveAudioSource).tag as MediaItem)
+  //       .toList();
+
+  //   print('pass 4');
+  //   queue.add(items);
+
+  //   print('pass 5');
+  //   await _player.clearAudioSources();
+  //   print('pass 6');
+  //   // Set new audio sources with preload
+  //   await _player.setAudioSources(_playlist,
+  //       preload: true, initialIndex: 0, initialPosition: Duration.zero);
+  //   print('pass 7');
+
+  //   // Force set the first media item manually
+  //   if (_playlist.isNotEmpty) {
+  //     final firstItem = _playlist[0] as ProgressiveAudioSource;
+  //     final media = firstItem.tag as MediaItem;
+  //     mediaItem.add(media);
+  //     print('pass 8');
+  //   }
+  //   print('pass 9');
+
+  //   // Play the new song
+  //   await _player.seek(Duration.zero, index: 0);
+  //   print('pass 10');
+  //   await _player.play();
+  //   print('pass 10');
+  // }
+
+  // // Load playlist of songs
+  // Future<void> loadPlaylist(List<AudioSource> list) async {
+  //   _playlist = list;
+  //   await _player.setAudioSources(_playlist);
+
+  //   // Update queue with media items extracted from playlist
+  //   queue.add(
+  //     _playlist
+  //         .map((source) => (source as ProgressiveAudioSource).tag as MediaItem)
+  //         .toList(),
+  //   );
+
+  //   // Set current mediaItem initially
+  //   if (_playlist.isNotEmpty) {
+  //     mediaItem.add((_playlist[0] as ProgressiveAudioSource).tag as MediaItem);
+  //   }
+  // }
 
   Future<void> addToPlaylist(AudioSource newSource) async {
     _playlist.add(newSource);
@@ -181,8 +237,8 @@ class AudioPlayerHandler extends BaseAudioHandler
     }
   }
 
-  Future<void> setAudioSource(AudioSource source) async {
-    print('setAudioSource() called');
-    await _player.setAudioSource(source);
-  }
+  // Future<void> setAudioSource(AudioSource source) async {
+  //   print('setAudioSource() called');
+  //   await _player.setAudioSource(source);
+  // }
 }

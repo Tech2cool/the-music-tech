@@ -2,10 +2,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:the_music_tech/core/models/cached_manifest.dart';
 import 'package:the_music_tech/core/models/models/home_suggestion.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/services/api_service.dart';
 import 'package:the_music_tech/core/services/audio_player_handler.dart';
+import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MyProvider with ChangeNotifier {
@@ -21,6 +23,14 @@ class MyProvider with ChangeNotifier {
   SearchModel? currentMedia;
 
   AudioPlayerHandler get audioHandler => _audioHandler;
+  MediaItem? _currentMusic;
+
+  MediaItem? get currentMusic => _currentMusic;
+  set currentMusic(MediaItem? item) {
+    _currentMusic = item;
+    notifyListeners();
+  }
+
   // SearchModel? get currentMedia => _currentMedia;
   // SearchModel? get currentAlbum => _currentAlbum;
   // SearchModel? get currentArtist => _currentArtist;
@@ -29,7 +39,11 @@ class MyProvider with ChangeNotifier {
   List<SearchModel> playlist = [];
   List<SearchModel> albumList = [];
   List<SearchModel> searchResult = [];
+  List<SearchModel> myPlayList = [];
+  List<SearchModel> history = [];
   List<HomeSuggestion> homeResults = [];
+  final Map<String, CachedManifest> _manifestCache = {};
+  final Duration cacheDuration = Duration(minutes: 45);
 
   // init services
   Future<void> init(MyProvider provider) async {
@@ -41,6 +55,12 @@ class MyProvider with ChangeNotifier {
         androidNotificationOngoing: true,
       ),
     );
+    _audioHandler.mediaItem.listen((mediaItem) {
+      if (mediaItem != null) {
+        _currentMusic = mediaItem;
+      }
+      notifyUser();
+    });
   }
 
   // calls
@@ -59,6 +79,50 @@ class MyProvider with ChangeNotifier {
     final results = await apiService.getHomeData();
     homeResults = results;
     notifyListeners();
+  }
+
+  void updateMyList(List<SearchModel> list) async {
+    myPlayList = list;
+    notifyListeners();
+  }
+
+  Future<void> addToHistory([SearchModel? song]) async {
+    final foundList = await SharedPrefService.getJsonArray('history');
+    if (foundList != null) {
+      final list = foundList.map((ele) => SearchModel.fromMap(ele)).toList();
+      history = list;
+    }
+    if (song != null) {
+      history.add(song);
+    }
+    final savedList = history.map((ele) => ele.toMap()).toList();
+
+    await SharedPrefService.storeJsonArray(
+      "history",
+      savedList,
+    );
+
+    notifyListeners();
+  }
+
+  Future<List<SearchModel>> getMyHistory() async {
+    final foundList = await SharedPrefService.getJsonArray('history');
+    if (foundList != null) {
+      final list = foundList.map((ele) => SearchModel.fromMap(ele)).toList();
+      history = list;
+    }
+    notifyListeners();
+    return history;
+  }
+
+  Future<List<SearchModel>> getMyPlayList() async {
+    final foundList = await SharedPrefService.getJsonArray('play_list');
+    if (foundList != null) {
+      final list = foundList.map((ele) => SearchModel.fromMap(ele)).toList();
+      myPlayList = list;
+    }
+    notifyListeners();
+    return myPlayList;
   }
 
   Future<void> getPlayListByid(SearchModel music) async {
@@ -88,30 +152,35 @@ class MyProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void notifyUser() {
+    Future.microtask(() => notifyListeners());
+  }
+
   // yt calls
   Future<void> playAudioFromYouTube(String videoId, SearchModel music) async {
     try {
-      // Check if the audio is already playing
-      // if (currentMedia?.videoId == videoId) {
-      //   // If the audio is already playing, just resume or toggle play/pause
-      //   await audioHandler.play();
-      //   return;
-      // }
       isLoading = true;
       Future.microtask(() => notifyListeners());
 
-      // setState(() {
-      //   isLoading = true;
-      // });
-
       StreamManifest? manifest;
-      try {
-        manifest = await youtubeExp.videos.streamsClient.getManifest(videoId);
-      } catch (e) {
-        print(e);
+      // Check cache first
+      final cached = _manifestCache[videoId];
+      final now = DateTime.now();
+      if (cached != null && now.difference(cached.cacheTime) < cacheDuration) {
+        manifest = cached.manifest;
+        print('Using cached manifest for $videoId');
+      } else {
+        try {
+          manifest = await youtubeExp.videos.streamsClient.getManifest(videoId);
+        } catch (e) {
+          print(e);
+        }
       }
       if (manifest != null) {
-        var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
+        var audioStreamInfo = manifest.audioOnly.first;
+        _manifestCache[videoId] = CachedManifest(manifest, now);
+        print('Cached manifest for $videoId at $now');
+
         var img = music.thumbnails.isNotEmpty ? music.thumbnails[0].url : null;
 
         final src = AudioSource.uri(
@@ -124,12 +193,18 @@ class MyProvider with ChangeNotifier {
             album: music.album?.name ?? 'Unknown Album',
           ),
         );
+        isLoading = false;
+        Future.microtask(() => notifyListeners());
+
         await audioHandler.loadPlaylist([src]);
+        // notifyListeners();
         try {
           // await audioHandler.player.play();
           loadPlayListInBackground();
         } catch (e) {
           //
+          isLoading = false;
+
           print(e);
         }
       } else {
@@ -141,14 +216,6 @@ class MyProvider with ChangeNotifier {
           await playAudioFromYouTube(nextSong.videoId!, nextSong);
         }
       }
-      // await loadAndPlay(
-      //   audioStreamInfo.url.toString(),
-      //   music.name ?? "NA",
-      //   music.artist?.name ?? 'Unknown Artist',
-      //   music.album?.name ?? 'Unknown Album',
-      //   music.thumbnails.isNotEmpty ? music.thumbnails[0].url : null,
-      //   music,
-      // );
     } catch (e) {
       // Helper.showCustomSnackBar("Error Loading Music");
     } finally {
@@ -173,7 +240,14 @@ class MyProvider with ChangeNotifier {
       final filtedList = playlist
           .where((ele) => ele.videoId != currentMedia?.videoId)
           .toList();
-
+      Set<SearchModel> uniqueSongs = Set<SearchModel>.from(history);
+      uniqueSongs.addAll(filtedList);
+      history = uniqueSongs.toList();
+      try {
+        await addToHistory();
+      } catch (e) {
+        //
+      }
       for (var pl in filtedList) {
         // final foundInList = audioHandler.playlist.firstWhereOrNull(
         //   (ele) =>
@@ -185,15 +259,28 @@ class MyProvider with ChangeNotifier {
         // }
         print("pass 2");
         StreamManifest? manifest;
-        try {
-          manifest = await youtubeExp.videos.streamsClient.getManifest(
-            pl.videoId ?? "",
-          );
-        } catch (e) {
-          print(e);
+        final cached = _manifestCache[pl.videoId];
+        final now = DateTime.now();
+        if (cached != null &&
+            now.difference(cached.cacheTime) < cacheDuration) {
+          manifest = cached.manifest;
+          print('Using cached manifest for ${pl.videoId}');
+        } else {
+          //
+          try {
+            manifest = await youtubeExp.videos.streamsClient.getManifest(
+              pl.videoId ?? "",
+            );
+          } catch (e) {
+            print(e);
+          }
         }
         if (manifest != null) {
-          var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
+          var audioStreamInfo = manifest.audioOnly.first;
+          _manifestCache[pl.videoId ?? ""] = CachedManifest(manifest, now);
+          print('Cached manifest for ${pl.videoId ?? ""} at $now');
+
+          // var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
           var img = pl.thumbnails.isNotEmpty ? pl.thumbnails[0].url : null;
 
           final src = AudioSource.uri(
@@ -210,15 +297,6 @@ class MyProvider with ChangeNotifier {
           print("${pl.videoId} added to play list");
         }
       }
-      // await audioHandler.loadPlaylist([src]);
-      // await loadAndPlay(
-      //   audioStreamInfo.url.toString(),
-      //   music.name ?? "NA",
-      //   music.artist?.name ?? 'Unknown Artist',
-      //   music.album?.name ?? 'Unknown Album',
-      //   music.thumbnails.isNotEmpty ? music.thumbnails[0].url : null,
-      //   music,
-      // );
     } catch (e) {
       print(e);
 

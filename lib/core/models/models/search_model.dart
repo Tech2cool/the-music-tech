@@ -115,6 +115,15 @@ class SearchModel {
 
   factory SearchModel.fromJson(String source) =>
       SearchModel.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SearchModel && other.videoId == videoId;
+  }
+
+  @override
+  int get hashCode => videoId.hashCode;
 }
 
 class Artist {

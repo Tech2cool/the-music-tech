@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class HorizontalSlider extends StatelessWidget {
   final String title;
   final List<Widget> childrens;
+  final List<Widget> headers;
 
   const HorizontalSlider({
     super.key,
     required this.title,
     required this.childrens,
+    this.headers = const [],
   });
 
   @override
@@ -23,7 +25,8 @@ class HorizontalSlider extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                 ),
-              )
+              ),
+              ...headers,
             ],
           ),
           SingleChildScrollView(
