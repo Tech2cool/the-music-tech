@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:the_music_tech/core/models/app_update.dart';
 import 'package:the_music_tech/core/models/models/home_suggestion.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 
@@ -116,6 +117,30 @@ class ApiService {
       final data = response.data['data'];
       return SearchModel.fromMap(data);
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<AppUpdate?> checkAppUpdate() async {
+    try {
+      final Response response = await _dio.get('/app-update');
+      final Map<String, dynamic> data = response.data["data"];
+      final AppUpdate update = AppUpdate.fromMap(data);
+
+      return update;
+    } on DioException catch (e) {
+      String errorMessage = 'Something went wrong';
+      if (e.response != null) {
+        errorMessage = e.response?.data['message'] ?? errorMessage;
+      } else {
+        errorMessage = e.message?.toString() ?? errorMessage;
+      }
+
+      // Prevent literal 'null' from showing
+      if (errorMessage.trim().toLowerCase() == 'null') {
+        errorMessage = 'Something went wrong';
+      }
+      // Helper.showCustomSnackBar(errorMessage);
       return null;
     }
   }

@@ -1,6 +1,8 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:the_music_tech/core/models/app_update.dart';
 import 'package:the_music_tech/core/models/cached_manifest.dart';
 import 'package:the_music_tech/core/models/models/home_suggestion.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
@@ -8,6 +10,7 @@ import 'package:the_music_tech/core/services/api_service.dart';
 import 'package:the_music_tech/core/services/audio_player_handler.dart';
 import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class MyProvider with ChangeNotifier {
   late final AudioPlayerHandler _audioHandler;
@@ -43,6 +46,7 @@ class MyProvider with ChangeNotifier {
   List<HomeSuggestion> homeResults = [];
   final Map<String, CachedManifest> _manifestCache = {};
   final Duration cacheDuration = Duration(minutes: 45);
+  AppUpdate? appUpdate;
 
   // init services
   Future<void> init(MyProvider provider) async {
@@ -305,5 +309,43 @@ class MyProvider with ChangeNotifier {
     }
     // isLoading = false;
     Future.microtask(() => notifyListeners());
+  }
+
+  bool _isUpdateAvailable(String currentVersion, String latestVersion) {
+    // Remove non-numeric characters (e.g., "-release") and parse as double
+    List<int> parseVersion(String version) {
+      return version
+          .split('.')
+          .map((part) =>
+              int.tryParse(part.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0)
+          .toList();
+    }
+
+    List<int> currentParts = parseVersion(currentVersion);
+    List<int> latestParts = parseVersion(latestVersion);
+
+    for (int i = 0; i < latestParts.length; i++) {
+      if (latestParts[i] > (i < currentParts.length ? currentParts[i] : 0)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> checkForAppUpdate(BuildContext context) async {
+    if (kIsWeb) return;
+    final appUpdateResp = await apiService.checkAppUpdate();
+    if (appUpdateResp != null) {
+      // Get current app version
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+      String currentVersion = packageInfo.version;
+      if (_isUpdateAvailable(currentVersion, appUpdateResp.version ?? "")) {
+        // GoRouter.of(context).push("/udpate-checker");
+      }
+      appUpdate = appUpdateResp;
+    }
+
+    notifyListeners();
   }
 }
