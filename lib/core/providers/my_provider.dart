@@ -163,6 +163,12 @@ class MyProvider with ChangeNotifier {
 
       StreamManifest? manifest;
       // Check cache first
+      try {
+        await addToHistory(music);
+      } catch (e) {
+        //
+      }
+
       final cached = _manifestCache[videoId];
       final now = DateTime.now();
       if (cached != null && now.difference(cached.cacheTime) < cacheDuration) {

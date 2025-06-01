@@ -115,6 +115,17 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                 }),
               ],
             ),
+            if (history.isEmpty) ...[
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: const Text(
+                    "Listen music, it will be added here...",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
             SizedBox(
               height: 10,
             ),
@@ -294,7 +305,7 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: const Text(
-                    "Checkout some Playlist or songs, it will be added here...",
+                    "Add music to Playlist...",
                     textAlign: TextAlign.center,
                   ),
                 ),

@@ -1,9 +1,11 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:toastification/toastification.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -85,8 +87,12 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
     final music = myProvider.currentMedia ?? widget.music;
     final isLoading = myProvider.isLoading;
     final cItem = audioHandler.mediaItem;
+    // final cItem = audioHandler.mediaItem;
     final newMedia =
         playlist.firstWhereOrNull((ele) => ele.videoId == cItem.value?.id);
+
+    final isLikedMusic = myProvider.myPlayList
+        .firstWhereOrNull((ele) => ele.videoId == cItem.value?.id);
 
     final thumbnails = newMedia != null
         ? newMedia.thumbnails.map((ele) => ele.url).toList()
@@ -101,6 +107,59 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
         Scaffold(
           appBar: AppBar(
             title: const Text('Now Playing'),
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  if (isLikedMusic != null) {
+                    final newList = playlist
+                        .where((ele) => ele.videoId != newMedia?.videoId)
+                        .toList();
+
+                    final updatedlist =
+                        newList.map((ele) => ele.toMap()).toList();
+
+                    myProvider.updateMyList(newList);
+
+                    await SharedPrefService.storeJsonArray(
+                      "play_list",
+                      updatedlist,
+                    );
+                    // if (context.mounted) {
+                    //   toastification.show(
+                    //     context: context,
+                    //     title: Text('Remove from playlist'),
+                    //     autoCloseDuration: const Duration(seconds: 5),
+                    //   );
+                    // }
+                  } else {
+                    final foundList = myProvider.myPlayList;
+                    final list = [...foundList, newMedia];
+                    final savedList = list.map((ele) => ele?.toMap()).toList();
+
+                    await SharedPrefService.storeJsonArray(
+                      "play_list",
+                      savedList,
+                    );
+                    // if (context.mounted) {
+                    //   toastification.show(
+                    //     context: context,
+                    //     title: Text('Added to playlist'),
+                    //     autoCloseDuration: const Duration(seconds: 5),
+                    //   );
+                    // }
+                  }
+                  await myProvider.getMyPlayList();
+                },
+                icon: Icon(
+                  FluentIcons.heart_12_filled,
+                  size: 30,
+                  color: isLikedMusic != null
+                      ? Colors.pink
+                      : Colors.grey.withAlpha(150),
+                ),
+              ),
+              SizedBox(width: 10),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),

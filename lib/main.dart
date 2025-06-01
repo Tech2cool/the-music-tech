@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/core/services/api_service.dart';
 import 'package:the_music_tech/wrapper/home_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   final myProvider = MyProvider();
   await myProvider.init(myProvider);
+  await ApiService().initialize();
 
   runApp(
     MultiProvider(

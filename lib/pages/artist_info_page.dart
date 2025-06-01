@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:the_music_tech/pages/album_info_page.dart';
 import 'package:the_music_tech/pages/music_player_page.dart';
 import 'package:the_music_tech/pages/playlist_info_page.dart';
+import 'package:toastification/toastification.dart';
 
 class ArtistInfoPage extends StatefulWidget {
   final SearchModel music;
@@ -202,10 +204,39 @@ class TopSongsTab extends StatelessWidget {
                           const Icon(Icons.image_not_supported),
                     ),
                   ),
-                  trailing: const Icon(
-                    Icons.play_circle_fill_rounded,
-                    size: 40,
+                  // trailing: const Icon(
+                  //   Icons.play_circle_fill_rounded,
+                  //   size: 40,
+                  // ),
+                  trailing: PopupMenuButton(
+                    itemBuilder: (context) {
+                      return [
+                        if (song.type == 'SONG' || song.type == 'VIDEO')
+                          PopupMenuItem(
+                            onTap: () async {
+                              //TODO: add to play list
+                              final foundList =
+                                  await myProvider.getMyPlayList();
+                              final list = [...foundList, song];
+                              final savedList =
+                                  list.map((ele) => ele.toMap()).toList();
+
+                              await SharedPrefService.storeJsonArray(
+                                "play_list",
+                                savedList,
+                              );
+                              toastification.show(
+                                context: context,
+                                title: Text('Added to playlist'),
+                                autoCloseDuration: const Duration(seconds: 5),
+                              );
+                            },
+                            child: Text("Add To Playlist"),
+                          ),
+                      ];
+                    },
                   ),
+
                   onTap: () {
                     if (song.type == "PLAYLIST") {
                       Navigator.push(
@@ -312,10 +343,39 @@ class TopAlbumsTab extends StatelessWidget {
                           const Icon(Icons.image_not_supported),
                     ),
                   ),
-                  trailing: const Icon(
-                    Icons.album_rounded,
-                    size: 40,
+                  // trailing: const Icon(
+                  //   Icons.album_rounded,
+                  //   size: 40,
+                  // ),
+                  trailing: PopupMenuButton(
+                    itemBuilder: (context) {
+                      return [
+                        if (song.type == 'SONG' || song.type == 'VIDEO')
+                          PopupMenuItem(
+                            onTap: () async {
+                              //TODO: add to play list
+                              final foundList =
+                                  await myProvider.getMyPlayList();
+                              final list = [...foundList, song];
+                              final savedList =
+                                  list.map((ele) => ele.toMap()).toList();
+
+                              await SharedPrefService.storeJsonArray(
+                                "play_list",
+                                savedList,
+                              );
+                              toastification.show(
+                                context: context,
+                                title: Text('Added to playlist'),
+                                autoCloseDuration: const Duration(seconds: 5),
+                              );
+                            },
+                            child: Text("Add To Playlist"),
+                          ),
+                      ];
+                    },
                   ),
+
                   onTap: () {
                     if (song.type == "PLAYLIST") {
                       Navigator.push(
@@ -411,10 +471,39 @@ class TopMix extends StatelessWidget {
                           const Icon(Icons.image_not_supported),
                     ),
                   ),
-                  trailing: const Icon(
-                    Icons.play_circle_fill_rounded,
-                    size: 40,
+                  // trailing: const Icon(
+                  //   Icons.play_circle_fill_rounded,
+                  //   size: 40,
+                  // ),
+                  trailing: PopupMenuButton(
+                    itemBuilder: (context) {
+                      return [
+                        if (song.type == 'SONG' || song.type == 'VIDEO')
+                          PopupMenuItem(
+                            onTap: () async {
+                              //TODO: add to play list
+                              final foundList =
+                                  await myProvider.getMyPlayList();
+                              final list = [...foundList, song];
+                              final savedList =
+                                  list.map((ele) => ele.toMap()).toList();
+
+                              await SharedPrefService.storeJsonArray(
+                                "play_list",
+                                savedList,
+                              );
+                              toastification.show(
+                                context: context,
+                                title: Text('Added to playlist'),
+                                autoCloseDuration: const Duration(seconds: 5),
+                              );
+                            },
+                            child: Text("Add To Playlist"),
+                          ),
+                      ];
+                    },
                   ),
+
                   onTap: () {
                     if (song.type == "PLAYLIST") {
                       Navigator.push(
@@ -509,10 +598,39 @@ class FeaturedTab extends StatelessWidget {
                           const Icon(Icons.image_not_supported),
                     ),
                   ),
-                  trailing: const Icon(
-                    Icons.play_circle_fill_rounded,
-                    size: 40,
+                  // trailing: const Icon(
+                  //   Icons.play_circle_fill_rounded,
+                  //   size: 40,
+                  // ),
+                  trailing: PopupMenuButton(
+                    itemBuilder: (context) {
+                      return [
+                        if (song.type == 'SONG' || song.type == 'VIDEO')
+                          PopupMenuItem(
+                            onTap: () async {
+                              //TODO: add to play list
+                              final foundList =
+                                  await myProvider.getMyPlayList();
+                              final list = [...foundList, song];
+                              final savedList =
+                                  list.map((ele) => ele.toMap()).toList();
+
+                              await SharedPrefService.storeJsonArray(
+                                "play_list",
+                                savedList,
+                              );
+                              toastification.show(
+                                context: context,
+                                title: Text('Added to playlist'),
+                                autoCloseDuration: const Duration(seconds: 5),
+                              );
+                            },
+                            child: Text("Add To Playlist"),
+                          ),
+                      ];
+                    },
                   ),
+
                   onTap: () {
                     if (song.type == "PLAYLIST") {
                       Navigator.push(
@@ -607,10 +725,39 @@ class SimilarArtistTab extends StatelessWidget {
                           const Icon(Icons.image_not_supported),
                     ),
                   ),
-                  trailing: const Icon(
-                    Icons.music_video,
-                    size: 40,
+                  // trailing: const Icon(
+                  //   Icons.music_video,
+                  //   size: 40,
+                  // ),
+                  trailing: PopupMenuButton(
+                    itemBuilder: (context) {
+                      return [
+                        if (song.type == 'SONG' || song.type == 'VIDEO')
+                          PopupMenuItem(
+                            onTap: () async {
+                              //TODO: add to play list
+                              final foundList =
+                                  await myProvider.getMyPlayList();
+                              final list = [...foundList, song];
+                              final savedList =
+                                  list.map((ele) => ele.toMap()).toList();
+
+                              await SharedPrefService.storeJsonArray(
+                                "play_list",
+                                savedList,
+                              );
+                              toastification.show(
+                                context: context,
+                                title: Text('Added to playlist'),
+                                autoCloseDuration: const Duration(seconds: 5),
+                              );
+                            },
+                            child: Text("Add To Playlist"),
+                          ),
+                      ];
+                    },
                   ),
+
                   onTap: () {
                     if (song.type == "PLAYLIST") {
                       Navigator.push(

@@ -23,14 +23,12 @@ class MiniPlayer extends StatelessWidget {
         : GestureDetector(
             onTap: () {
               // TODO: navigation to music
-              if (newMedia != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MusicPlayerPage(),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MusicPlayerPage(),
+                ),
+              );
             },
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),

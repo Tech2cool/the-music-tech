@@ -2,19 +2,50 @@ import 'package:dio/dio.dart';
 import 'package:the_music_tech/core/models/models/home_suggestion.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 
-const baseUrl = "https://music-tech-rho.vercel.app";
+// const baseUrl = "https://music-tech-rho.vercel.app";
 // const baseUrl = "http://192.168.1.109:8082";
+// const baseUrl = "http://129.154.251.173";
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
+
   late Dio _dio;
+  final List<String> _baseUrls = [
+    "http://129.154.251.173", // Backup
+    "https://music-tech-rho.vercel.app", // Primary
+    // "http://192.168.1.109:8082", // Primary
+  ];
+  late String baseUrl;
 
   ApiService._internal() {
-    _dio = Dio(BaseOptions(baseUrl: baseUrl));
-    // _dio.interceptors.add(_A uthInterceptor());
-    // _dio.interceptors.add(_ResponseInterceptor());
+    _dio = Dio();
   }
+
+  Future<void> initialize() async {
+    for (String url in _baseUrls) {
+      try {
+        final response = await _dio.get(url,
+            options: Options(
+              receiveTimeout: Duration(seconds: 2),
+              sendTimeout: Duration(seconds: 2),
+              validateStatus: (status) => status! < 500,
+            ));
+        if (response.statusCode == 200) {
+          baseUrl = url;
+          _dio.options.baseUrl = baseUrl;
+          // print("✅ Connected to: $baseUrl");
+          return;
+        }
+      } catch (_) {
+        // print("❌ Failed to connect to $url");
+      }
+    }
+
+    throw Exception("🚫 No valid baseUrl could be reached.");
+  }
+
+  Dio get client => _dio;
 
   Future<List<HomeSuggestion>> getHomeData() async {
     try {

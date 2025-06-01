@@ -23,7 +23,10 @@ class _HomePageState extends State<HomePage> {
         context,
         listen: false,
       );
-      await myProvider.getHomeSuggestion();
+      await Future.wait([
+        myProvider.getHomeSuggestion(),
+        myProvider.getMyPlayList(),
+      ]);
     } catch (e) {
       //
     }

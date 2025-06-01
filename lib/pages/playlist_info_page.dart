@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:the_music_tech/pages/album_info_page.dart';
 import 'package:the_music_tech/pages/artist_info_page.dart';
 import 'package:the_music_tech/pages/music_player_page.dart';
+import 'package:toastification/toastification.dart';
 
 class PlayListInfoPage extends StatefulWidget {
   final SearchModel music;
@@ -132,10 +134,43 @@ class _PlayListInfoPageState extends State<PlayListInfoPage> {
                             const Icon(Icons.image_not_supported),
                       ),
                     ),
-                    trailing: const Icon(
-                      Icons.play_circle_fill_rounded,
-                      size: 40,
-                    ),
+                    // trailing: const Icon(
+                    //   Icons.play_circle_fill_rounded,
+                    //   size: 40,
+                    // ),
+                    trailing: (song.type == 'SONG' || song.type == 'VIDEO')
+                        ? PopupMenuButton(
+                            itemBuilder: (context) {
+                              return [
+                                if (song.type == 'SONG' || song.type == 'VIDEO')
+                                  PopupMenuItem(
+                                    onTap: () async {
+                                      //TODO: add to play list
+                                      final foundList =
+                                          await myProvider.getMyPlayList();
+                                      final list = [...foundList, song];
+                                      final savedList = list
+                                          .map((ele) => ele.toMap())
+                                          .toList();
+
+                                      await SharedPrefService.storeJsonArray(
+                                        "play_list",
+                                        savedList,
+                                      );
+                                      toastification.show(
+                                        context: context,
+                                        title: Text('Added to playlist'),
+                                        autoCloseDuration:
+                                            const Duration(seconds: 5),
+                                      );
+                                    },
+                                    child: Text("Add To Playlist"),
+                                  ),
+                              ];
+                            },
+                          )
+                        : null,
+
                     onTap: () {
                       if (song.type == "PLAYLIST") {
                         Navigator.push(

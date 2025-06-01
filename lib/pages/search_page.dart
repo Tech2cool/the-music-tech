@@ -248,7 +248,6 @@ class _SearchPageState extends State<SearchPage> {
                             if (song.type == 'SONG' || song.type == 'VIDEO')
                               PopupMenuItem(
                                 onTap: () async {
-                                  //TODO: add to play list
                                   final foundList =
                                       await myProvider.getMyPlayList();
                                   final list = [...foundList, song];
@@ -259,12 +258,14 @@ class _SearchPageState extends State<SearchPage> {
                                     "play_list",
                                     savedList,
                                   );
-                                  toastification.show(
-                                    context: context,
-                                    title: Text('Added to playlist'),
-                                    autoCloseDuration:
-                                        const Duration(seconds: 5),
-                                  );
+                                  if (context.mounted) {
+                                    toastification.show(
+                                      context: context,
+                                      title: Text('Added to playlist'),
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    );
+                                  }
                                 },
                                 child: Text("Add To Playlist"),
                               ),
