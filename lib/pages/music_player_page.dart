@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
+import 'package:toastification/toastification.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
@@ -50,51 +51,23 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
         listen: false,
       );
 
-      // setState(() {
-      //   isLoading = true;
-      // });
       final music = myProvider.currentMedia ?? widget.music;
       if (music == null) {
-        print("musc not provided");
+        // print("musc not provided");
+        toastification.show(
+          context: context,
+          title: Text(
+            'Music your looking for not available at moment, please try again',
+          ),
+          autoCloseDuration: const Duration(seconds: 5),
+        );
+
         return;
       }
       await myProvider.playAudioFromYouTube(videoId, music);
     } catch (e) {
       //
     }
-    // setState(() {
-    //   isLoading = false;
-    // });
-
-    //   // Check if the audio is already playing
-    //   if (myProvider.currentMedia?.videoId == videoId) {
-    //     // If the audio is already playing, just resume or toggle play/pause
-    //     await myProvider.audioHandler.play();
-    //     return;
-    //   }
-
-    //   setState(() {
-    //     isLoading = true;
-    //   });
-
-    //   var manifest = await _yt.videos.streamsClient.getManifest(videoId);
-    //   var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
-
-    //   await myProvider.loadAndPlay(
-    //     audioStreamInfo.url.toString(),
-    //     music.name ?? "NA",
-    //     music.artist?.name ?? 'Unknown Artist',
-    //     music.album?.name ?? 'Unknown Album',
-    //     music.thumbnails.isNotEmpty ? music.thumbnails[0].url : null,
-    //     music,
-    //   );
-    // } catch (e) {
-    //   Helper.showCustomSnackBar("Error Loading Music");
-    // } finally {
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // }
   }
 
   @override
@@ -231,25 +204,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                         onPressed: () {
                           audioHandler.skipToPrevious();
                           setState(() {});
-                        } // myProvider.onTapPrev,
-                        // onPressed: () {
-                        //   if (myProvider.currentIndex <= 0) return;
-                        //   // setState(() {
-                        //   //   music =
-                        //   //       playlist[myProvider.currentIndex - 1];
-                        //   // });
-                        //   myProvider.updateCurrentMusic(
-                        //       playlist[myProvider.currentIndex - 1]);
-
-                        //   _playAudioFromYouTube(
-                        //     playlist[myProvider.currentIndex - 1]
-                        //         .videoId!,
-                        //   );
-                        //   myProvider.updateCurrentIndex(
-                        //     myProvider.currentIndex - 1,
-                        //   );
-                        // },
-                        ),
+                        }),
                     // play/pause
                     StreamBuilder<PlaybackState>(
                       stream: audioHandler.playbackState,
@@ -274,44 +229,19 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                     ),
                     //skip next
                     IconButton(
-                        icon: Icon(
-                          Icons.skip_next_rounded,
-                          color: (audioHandler.player.currentIndex ?? 0) <=
-                                  audioHandler.playlist.length - 1
-                              ? Colors.white
-                              : Colors.grey.shade600,
-                          size: 30,
-                        ),
-                        onPressed: () {
-                          audioHandler.skipToNext();
-                          setState(() {});
-                        } //myProvider.onTapNext,
-                        // onPressed: () {
-                        //   if (myProvider.currentIndex >=
-                        //       playlist.length) {
-                        //     // Helper.showCustomSnackBar("no next song");
-                        //     return;
-                        //   }
-                        //   myProvider.updateCurrentMusic(
-                        //       playlist[myProvider.currentIndex + 1]);
-                        //   // setState(() {
-                        //   //   music =
-                        //   //       playlist[myProvider.currentIndex + 1];
-                        //   // });
-
-                        //   _playAudioFromYouTube(
-                        //     playlist[myProvider.currentIndex + 1]
-                        //         .videoId!,
-                        //   );
-                        //   myProvider.updateCurrentIndex(
-                        //     myProvider.currentIndex + 1,
-                        //   );
-                        // },
-                        ),
-                    // IconButton(
-                    //   icon: const Icon(Icons.stop),
-                    //   onPressed: myProvider.stop,
-                    // ),
+                      icon: Icon(
+                        Icons.skip_next_rounded,
+                        color: (audioHandler.player.currentIndex ?? 0) <=
+                                audioHandler.playlist.length - 1
+                            ? Colors.white
+                            : Colors.grey.shade600,
+                        size: 30,
+                      ),
+                      onPressed: () {
+                        audioHandler.skipToNext();
+                        setState(() {});
+                      },
+                    ),
                   ],
                 ),
               ],

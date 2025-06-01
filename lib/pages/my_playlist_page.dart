@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_music_tech/components/horizontal_slider.dart';
 import 'package:the_music_tech/components/vertical_card.dart';
-import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
 import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:the_music_tech/pages/album_info_page.dart';
@@ -48,7 +47,6 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     onRefresh();
   }
@@ -89,7 +87,6 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                 Spacer(),
                 GestureDetector(
                   onTap: () {
-                    //TODO: See all
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => MyHistoryPage(),
@@ -234,11 +231,13 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                                 "play_list",
                                 updatedlist,
                               );
-                              toastification.show(
-                                context: context,
-                                title: Text('Remove from playList'),
-                                autoCloseDuration: const Duration(seconds: 5),
-                              );
+                              if (context.mounted) {
+                                toastification.show(
+                                  context: context,
+                                  title: Text('Remove from playList'),
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                );
+                              }
                             },
                             child: Text("Remove from list"),
                           ),

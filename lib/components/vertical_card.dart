@@ -5,6 +5,7 @@ import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
 import 'package:the_music_tech/pages/album_info_page.dart';
 import 'package:the_music_tech/pages/artist_info_page.dart';
+import 'package:the_music_tech/pages/music_player_page.dart';
 import 'package:the_music_tech/pages/playlist_info_page.dart';
 
 class VerticalCard extends StatelessWidget {
@@ -28,7 +29,6 @@ class VerticalCard extends StatelessWidget {
         : null;
     return GestureDetector(
       onTap: () {
-        //TODO: fix navigation
         if (item.type == "PLAYLIST") {
           Navigator.push(
             context,
@@ -57,16 +57,16 @@ class VerticalCard extends StatelessWidget {
             ),
           );
         } else {
-          // myProvider.playlist = list;
-
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => MusicPlayerPage(
-          //       music: item,
-          //     ),
-          //   ),
-          // );
+          myProvider.playlist = list;
+          // myProvider.currentIndex = index;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MusicPlayerPage(
+                music: item,
+              ),
+            ),
+          );
         }
       },
       child: Container(

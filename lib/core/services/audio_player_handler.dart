@@ -88,66 +88,6 @@ class AudioPlayerHandler extends BaseAudioHandler
     // print('Playlist loaded and playing.');
   }
 
-  // Future<void> loadPlaylist(List<AudioSource> list) async {
-  //   print('pass 1');
-  //   // Hard stop current playback
-  //   await _player.stop();
-
-  //   print('pass 2');
-  //   // Replace internal playlist
-  //   _playlist = list;
-
-  //   // Update queue before setting source
-  //   print('pass 3');
-  //   final items = _playlist
-  //       .map((source) => (source as ProgressiveAudioSource).tag as MediaItem)
-  //       .toList();
-
-  //   print('pass 4');
-  //   queue.add(items);
-
-  //   print('pass 5');
-  //   await _player.clearAudioSources();
-  //   print('pass 6');
-  //   // Set new audio sources with preload
-  //   await _player.setAudioSources(_playlist,
-  //       preload: true, initialIndex: 0, initialPosition: Duration.zero);
-  //   print('pass 7');
-
-  //   // Force set the first media item manually
-  //   if (_playlist.isNotEmpty) {
-  //     final firstItem = _playlist[0] as ProgressiveAudioSource;
-  //     final media = firstItem.tag as MediaItem;
-  //     mediaItem.add(media);
-  //     print('pass 8');
-  //   }
-  //   print('pass 9');
-
-  //   // Play the new song
-  //   await _player.seek(Duration.zero, index: 0);
-  //   print('pass 10');
-  //   await _player.play();
-  //   print('pass 10');
-  // }
-
-  // // Load playlist of songs
-  // Future<void> loadPlaylist(List<AudioSource> list) async {
-  //   _playlist = list;
-  //   await _player.setAudioSources(_playlist);
-
-  //   // Update queue with media items extracted from playlist
-  //   queue.add(
-  //     _playlist
-  //         .map((source) => (source as ProgressiveAudioSource).tag as MediaItem)
-  //         .toList(),
-  //   );
-
-  //   // Set current mediaItem initially
-  //   if (_playlist.isNotEmpty) {
-  //     mediaItem.add((_playlist[0] as ProgressiveAudioSource).tag as MediaItem);
-  //   }
-  // }
-
   Future<void> addToPlaylist(AudioSource newSource) async {
     _playlist.add(newSource);
 
@@ -191,35 +131,35 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> play() {
-    print('play() called');
+    // print('play() called');
     return _player.play();
   }
 
   @override
   Future<void> pause() {
-    print('pause() called');
+    // print('pause() called');
     return _player.pause();
   }
 
   @override
   Future<void> stop() {
-    print('stop() called');
+    // print('stop() called');
     return _player.stop();
   }
 
   @override
   Future<void> seek(Duration position) {
-    print('seek() called: $position');
+    // print('seek() called: $position');
     return _player.seek(position);
   }
 
   @override
   Future<void> skipToNext() async {
-    print('skipToNext() called');
+    // print('skipToNext() called');
     final sequence = _player.sequence;
     final currentIndex = _player.currentIndex ?? 0;
     final nextIndex = currentIndex + 1;
-    if (sequence != null && nextIndex < sequence.length) {
+    if (nextIndex < sequence.length) {
       await _player.seek(Duration.zero, index: nextIndex);
       await play();
     }
@@ -227,18 +167,13 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToPrevious() async {
-    print('skipToPrevious() called');
-    final sequence = _player.sequence;
+    // print('skipToPrevious() called');
+    // final sequence = _player.sequence;
     final currentIndex = _player.currentIndex ?? 0;
     final prevIndex = currentIndex - 1;
-    if (sequence != null && prevIndex >= 0) {
+    if (prevIndex >= 0) {
       await _player.seek(Duration.zero, index: prevIndex);
       await play();
     }
   }
-
-  // Future<void> setAudioSource(AudioSource source) async {
-  //   print('setAudioSource() called');
-  //   await _player.setAudioSource(source);
-  // }
 }

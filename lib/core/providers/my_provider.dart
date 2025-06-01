@@ -1,5 +1,4 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:the_music_tech/core/models/cached_manifest.dart';
@@ -168,18 +167,18 @@ class MyProvider with ChangeNotifier {
       final now = DateTime.now();
       if (cached != null && now.difference(cached.cacheTime) < cacheDuration) {
         manifest = cached.manifest;
-        print('Using cached manifest for $videoId');
+        // print('Using cached manifest for $videoId');
       } else {
         try {
           manifest = await youtubeExp.videos.streamsClient.getManifest(videoId);
         } catch (e) {
-          print(e);
+          // print(e);
         }
       }
       if (manifest != null) {
         var audioStreamInfo = manifest.audioOnly.first;
         _manifestCache[videoId] = CachedManifest(manifest, now);
-        print('Cached manifest for $videoId at $now');
+        // print('Cached manifest for $videoId at $now');
 
         var img = music.thumbnails.isNotEmpty ? music.thumbnails[0].url : null;
 
@@ -205,16 +204,14 @@ class MyProvider with ChangeNotifier {
           //
           isLoading = false;
 
-          print(e);
+          // print(e);
         }
       } else {
         final nextSong = playlist[currentIndex + 1];
-        if (nextSong != null) {
-          currentIndex += 1;
-          currentMedia = nextSong;
-          Future.microtask(() => notifyListeners());
-          await playAudioFromYouTube(nextSong.videoId!, nextSong);
-        }
+        currentIndex += 1;
+        currentMedia = nextSong;
+        Future.microtask(() => notifyListeners());
+        await playAudioFromYouTube(nextSong.videoId!, nextSong);
       }
     } catch (e) {
       // Helper.showCustomSnackBar("Error Loading Music");
@@ -226,17 +223,13 @@ class MyProvider with ChangeNotifier {
   }
 
   Future<void> loadPlayListInBackground() async {
-    print("pass 0");
+    // print("pass 0");
 
     if (playlist.isEmpty) {
       return;
     }
-    print("pass 1");
+    // print("pass 1");
     try {
-      // Check if the audio is already playing
-      // setState(() {
-      //   isLoading = true;
-      // });
       final filtedList = playlist
           .where((ele) => ele.videoId != currentMedia?.videoId)
           .toList();
@@ -257,14 +250,14 @@ class MyProvider with ChangeNotifier {
         // if (foundInList != null) {
         //   return;
         // }
-        print("pass 2");
+        // print("pass 2");
         StreamManifest? manifest;
         final cached = _manifestCache[pl.videoId];
         final now = DateTime.now();
         if (cached != null &&
             now.difference(cached.cacheTime) < cacheDuration) {
           manifest = cached.manifest;
-          print('Using cached manifest for ${pl.videoId}');
+          // print('Using cached manifest for ${pl.videoId}');
         } else {
           //
           try {
@@ -272,13 +265,13 @@ class MyProvider with ChangeNotifier {
               pl.videoId ?? "",
             );
           } catch (e) {
-            print(e);
+            // print(e);
           }
         }
         if (manifest != null) {
           var audioStreamInfo = manifest.audioOnly.first;
           _manifestCache[pl.videoId ?? ""] = CachedManifest(manifest, now);
-          print('Cached manifest for ${pl.videoId ?? ""} at $now');
+          // print('Cached manifest for ${pl.videoId ?? ""} at $now');
 
           // var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
           var img = pl.thumbnails.isNotEmpty ? pl.thumbnails[0].url : null;
@@ -294,11 +287,11 @@ class MyProvider with ChangeNotifier {
             ),
           );
           await audioHandler.addToPlaylist(src);
-          print("${pl.videoId} added to play list");
+          // print("${pl.videoId} added to play list");
         }
       }
     } catch (e) {
-      print(e);
+      // print(e);
 
       // Helper.showCustomSnackBar("Error Loading Music");
     } finally {
