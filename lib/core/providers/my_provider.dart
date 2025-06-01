@@ -9,6 +9,7 @@ import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/services/api_service.dart';
 import 'package:the_music_tech/core/services/audio_player_handler.dart';
 import 'package:the_music_tech/core/services/shared_pref_service.dart';
+import 'package:toastification/toastification.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -163,7 +164,7 @@ class MyProvider with ChangeNotifier {
   Future<void> playAudioFromYouTube(String videoId, SearchModel music) async {
     try {
       isLoading = true;
-      Future.microtask(() => notifyListeners());
+      notifyUser();
 
       StreamManifest? manifest;
       // Check cache first
@@ -171,65 +172,87 @@ class MyProvider with ChangeNotifier {
         await addToHistory(music);
       } catch (e) {
         //
+        print(e);
       }
 
       final cached = _manifestCache[videoId];
       final now = DateTime.now();
       if (cached != null && now.difference(cached.cacheTime) < cacheDuration) {
         manifest = cached.manifest;
-        // print('Using cached manifest for $videoId');
+        print('Using cached manifest for $videoId');
       } else {
         try {
-          manifest = await youtubeExp.videos.streamsClient.getManifest(videoId);
+          manifest = await youtubeExp.videos.streamsClient
+              .getManifest(videoId)
+              .timeout(Duration(seconds: 15));
         } catch (e) {
-          // print(e);
+          print(e);
         }
       }
+      isLoading = false;
+      notifyUser();
+
       if (manifest != null) {
-        var audioStreamInfo = manifest.audioOnly.first;
-        _manifestCache[videoId] = CachedManifest(manifest, now);
-        // print('Cached manifest for $videoId at $now');
+        if (manifest.audioOnly.isNotEmpty) {
+          var audioStreamInfo = manifest.audioOnly.first;
+          _manifestCache[videoId] = CachedManifest(manifest, now);
+          print('Cached manifest for $videoId at $now');
 
-        var img = music.thumbnails.isNotEmpty ? music.thumbnails[0].url : null;
+          var img =
+              music.thumbnails.isNotEmpty ? music.thumbnails[0].url : null;
 
-        final src = AudioSource.uri(
-          audioStreamInfo.url,
-          tag: MediaItem(
-            id: videoId,
-            title: music.name ?? "NA",
-            artist: music.artist?.name ?? 'Unknown Artist',
-            artUri: img != null ? Uri.parse(img) : null,
-            album: music.album?.name ?? 'Unknown Album',
-          ),
-        );
-        isLoading = false;
-        Future.microtask(() => notifyListeners());
-
-        await audioHandler.loadPlaylist([src]);
-        // notifyListeners();
-        try {
-          // await audioHandler.player.play();
-          loadPlayListInBackground();
-        } catch (e) {
-          //
+          final src = AudioSource.uri(
+            audioStreamInfo.url,
+            tag: MediaItem(
+              id: videoId,
+              title: music.name ?? "NA",
+              artist: music.artist?.name ?? 'Unknown Artist',
+              artUri: img != null ? Uri.parse(img) : null,
+              album: music.album?.name ?? 'Unknown Album',
+            ),
+          );
           isLoading = false;
+          notifyUser();
+          try {
+            await audioHandler.loadPlaylist([src]);
+          } catch (e) {
+            //
+            print(e);
+          }
+          // notifyListeners();
+          try {
+            // await audioHandler.player.play();
+            loadPlayListInBackground();
+          } catch (e) {
+            //
+            isLoading = false;
 
-          // print(e);
+            print(e);
+          }
+          // proceed with using audioStreamInfo
+        } else {
+          print('No audio streams available for video: ${videoId}');
+          // You can fallback, skip, or show a message
+          toastification.show(
+            title: Text('Sorry but this music currently unavailable'),
+            autoCloseDuration: const Duration(seconds: 5),
+          );
         }
       } else {
         final nextSong = playlist[currentIndex + 1];
         currentIndex += 1;
         currentMedia = nextSong;
-        Future.microtask(() => notifyListeners());
+        notifyUser();
         await playAudioFromYouTube(nextSong.videoId!, nextSong);
       }
     } catch (e) {
       // Helper.showCustomSnackBar("Error Loading Music");
+      print(e);
     } finally {
       //
     }
     isLoading = false;
-    Future.microtask(() => notifyListeners());
+    notifyUser();
   }
 
   Future<void> loadPlayListInBackground() async {
@@ -271,33 +294,45 @@ class MyProvider with ChangeNotifier {
         } else {
           //
           try {
-            manifest = await youtubeExp.videos.streamsClient.getManifest(
-              pl.videoId ?? "",
-            );
+            manifest = await youtubeExp.videos.streamsClient
+                .getManifest(
+                  pl.videoId ?? "",
+                )
+                .timeout(Duration(seconds: 15));
           } catch (e) {
             // print(e);
           }
         }
         if (manifest != null) {
-          var audioStreamInfo = manifest.audioOnly.first;
-          _manifestCache[pl.videoId ?? ""] = CachedManifest(manifest, now);
-          // print('Cached manifest for ${pl.videoId ?? ""} at $now');
+          if (manifest.audioOnly.isNotEmpty) {
+            var audioStreamInfo = manifest.audioOnly.first;
+            // proceed with using audioStreamInfo
+            _manifestCache[pl.videoId ?? ""] = CachedManifest(manifest, now);
+            // print('Cached manifest for ${pl.videoId ?? ""} at $now');
 
-          // var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
-          var img = pl.thumbnails.isNotEmpty ? pl.thumbnails[0].url : null;
+            // var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
+            var img = pl.thumbnails.isNotEmpty ? pl.thumbnails[0].url : null;
 
-          final src = AudioSource.uri(
-            audioStreamInfo.url,
-            tag: MediaItem(
-              id: pl.videoId!,
-              title: pl.name ?? "NA",
-              artist: pl.artist?.name ?? 'Unknown Artist',
-              artUri: img != null ? Uri.parse(img) : null,
-              album: pl.album?.name ?? 'Unknown Album',
-            ),
-          );
-          await audioHandler.addToPlaylist(src);
-          // print("${pl.videoId} added to play list");
+            final src = AudioSource.uri(
+              audioStreamInfo.url,
+              tag: MediaItem(
+                id: pl.videoId!,
+                title: pl.name ?? "NA",
+                artist: pl.artist?.name ?? 'Unknown Artist',
+                artUri: img != null ? Uri.parse(img) : null,
+                album: pl.album?.name ?? 'Unknown Album',
+              ),
+            );
+            await audioHandler.addToPlaylist(src);
+            // print("${pl.videoId} added to play list");
+          } else {
+            print('No audio streams available for video: ${pl.videoId}');
+            // You can fallback, skip, or show a message
+            toastification.show(
+              title: Text('Sorry but this music currently unavailable'),
+              autoCloseDuration: const Duration(seconds: 5),
+            );
+          }
         }
       }
     } catch (e) {
