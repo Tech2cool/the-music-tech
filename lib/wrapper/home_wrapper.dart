@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_music_tech/components/mini_player.dart';
+import 'package:the_music_tech/core/providers/my_provider.dart';
 import 'package:the_music_tech/pages/home_page.dart';
 import 'package:the_music_tech/pages/my_playlist_page.dart';
 import 'package:the_music_tech/pages/search_page.dart';
@@ -13,7 +15,24 @@ class HomeWrapper extends StatefulWidget {
 }
 
 class _HomeWrapperState extends State<HomeWrapper> {
+  //
+  Future<void> onRefresh() async {
+    final myProvider = Provider.of<MyProvider>(
+      context,
+      listen: false,
+    );
+    print("called on Refresh");
+    await myProvider.checkForAppUpdate(context);
+  }
+
   int selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    onRefresh();
+  }
+
   final _items = [
     const BottomNavigationBarItem(
       label: 'Home',

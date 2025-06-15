@@ -3,6 +3,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:the_music_tech/components/update_checker.dart';
 import 'package:the_music_tech/core/models/app_update.dart';
 import 'package:the_music_tech/core/models/cached_manifest.dart';
 import 'package:the_music_tech/core/models/models/home_suggestion.dart';
@@ -571,12 +572,21 @@ class MyProvider with ChangeNotifier {
 
     try {
       final appUpdateResp = await apiService.checkAppUpdate();
+      // print(appUpdateResp?.toJson());
       if (appUpdateResp != null) {
         PackageInfo packageInfo = await PackageInfo.fromPlatform();
-        String currentVersion = packageInfo.version;
+        String currentVersion = packageInfo.buildNumber;
+
+        // print(currentVersion);
 
         if (_isUpdateAvailable(currentVersion, appUpdateResp.version ?? "")) {
+          // print("yes update");
           // Handle update logic here
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => UpdateChecker(),
+            ),
+          );
         }
         appUpdate = appUpdateResp;
       }

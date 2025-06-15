@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -49,8 +48,6 @@ class _UpdateCheckerState extends State<UpdateChecker> {
         }
         filePath = path.join(downloadsDir.path, 'app_update.apk');
 
-        // filePath = '${directory!.path}/app_update.apk';
-
         Dio dio = Dio();
         await dio.download(
           url,
@@ -92,10 +89,13 @@ class _UpdateCheckerState extends State<UpdateChecker> {
 
     return Stack(
       children: [
-        Image.asset(
-          "assets/images/rocket-flying.jpg",
+        Image.network(
+          "https://d29fhpw069ctt2.cloudfront.net/photo/3380/preview/addd3a4d-c1db-49f7-b309-9e66bff3ff2e_1280x1280.jpg",
           height: double.infinity,
           fit: BoxFit.cover,
+        ),
+        Container(
+          color: Colors.black.withAlpha(100),
         ),
         Scaffold(
           backgroundColor: Colors.transparent,
@@ -236,7 +236,7 @@ class _UpdateCheckerState extends State<UpdateChecker> {
                   child: const Text(
                     "Later",
                     style: TextStyle(
-                      color: Colors.redAccent,
+                      color: Colors.red,
                     ),
                   ),
                 ),

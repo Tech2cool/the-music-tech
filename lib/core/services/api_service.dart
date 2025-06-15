@@ -123,12 +123,19 @@ class ApiService {
 
   Future<AppUpdate?> checkAppUpdate() async {
     try {
-      final Response response = await _dio.get('/app-update');
-      final Map<String, dynamic> data = response.data["data"];
+      // print('pass 1');
+      final Response response = await _dio.get('/version');
+      // print('pass 2');
+
+      final data = response.data["data"];
+      // print('pass 3');
+      // print(data);
       final AppUpdate update = AppUpdate.fromMap(data);
+      // print('pass 4');
 
       return update;
     } on DioException catch (e) {
+      // print('$e');
       String errorMessage = 'Something went wrong';
       if (e.response != null) {
         errorMessage = e.response?.data['message'] ?? errorMessage;

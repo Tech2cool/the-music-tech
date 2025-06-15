@@ -22,11 +22,9 @@ class AppUpdate {
 
   factory AppUpdate.fromMap(Map<String, dynamic> map) {
     return AppUpdate(
-      description:
-          map['description'] != null ? map['description'] as String : null,
-      version: map['version'] != null ? map['version'] as String : null,
-      downloadLink:
-          map['downloadLink'] != null ? map['downloadLink'] as String : null,
+      description: map['desc'] != null ? map['desc'] as String : null,
+      version: map['app_version'] != null ? map['app_version'] as String : null,
+      downloadLink: map['app_url'] != null ? map['app_url'] as String : null,
     );
   }
 

@@ -9,7 +9,6 @@ import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
 import 'package:the_music_tech/core/services/shared_pref_service.dart';
 import 'package:toastification/toastification.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
 
@@ -218,52 +217,23 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                   ),
                 ),
                 const Spacer(),
-                HorizontalSlider(
-                  title: "Suggested For you",
-                  childrens: [
-                    ...List.generate(
-                      suggested.length,
-                      (i2) {
-                        final record2 = suggested[i2];
+                if (suggested.isNotEmpty)
+                  HorizontalSlider(
+                    title: "Suggested For you",
+                    childrens: [
+                      ...List.generate(
+                        suggested.length,
+                        (i2) {
+                          final record2 = suggested[i2];
 
-                        return Stack(
-                          children: [
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: PopupMenuButton(
-                                itemBuilder: (context) {
-                                  return [
-                                    PopupMenuItem(
-                                      onTap: () {
-                                        myProvider.loadSingleItemInBackground(
-                                          record2,
-                                        );
-                                        if (context.mounted) {
-                                          toastification.show(
-                                            context: context,
-                                            title: Text('added to queue'),
-                                            autoCloseDuration:
-                                                const Duration(seconds: 5),
-                                          );
-                                        }
-                                      },
-                                      child: Text("add to queue"),
-                                    ),
-                                  ];
-                                },
-                              ),
-                            ),
-                            VerticalCard(
-                              item: record2,
-                              list: suggested,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                          return VerticalCard(
+                            item: record2,
+                            list: suggested,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 StreamBuilder<Duration?>(
                   stream: myProvider.durationStream,
                   builder: (context, durationSnapshot) {
