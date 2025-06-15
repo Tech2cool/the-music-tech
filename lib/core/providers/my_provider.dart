@@ -575,7 +575,7 @@ class MyProvider with ChangeNotifier {
       // print(appUpdateResp?.toJson());
       if (appUpdateResp != null) {
         PackageInfo packageInfo = await PackageInfo.fromPlatform();
-        String currentVersion = packageInfo.buildNumber;
+        String currentVersion = packageInfo.version;
 
         // print(currentVersion);
 
