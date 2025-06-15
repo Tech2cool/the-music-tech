@@ -316,7 +316,7 @@ class MyProvider with ChangeNotifier {
     setLoading(true);
 
     // Non-blocking history addition
-    // addToHistory(music).catchError((e) => print("History error: $e"));
+    addToHistory(music).catchError((e) => {});
 
     StreamManifest? manifest;
     final now = DateTime.now();
@@ -403,13 +403,12 @@ class MyProvider with ChangeNotifier {
       for (final item in [...history, ...filteredList]) {
         if (item.videoId != null) {
           uniqueHistory[item.videoId!] = item;
+          // Save history in background
+          addToHistory(item).catchError((e) => {});
         }
       }
       history = uniqueHistory.values.toList();
       _limitListSize(history, maxHistorySize);
-
-      // Save history in background
-      // addToHistory().catchError((e) => print("Add to history failed: $e"));
 
       // Process in batches to prevent overwhelming
       for (int i = 0; i < filteredList.length; i += batchSize) {
