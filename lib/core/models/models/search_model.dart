@@ -11,7 +11,7 @@ class SearchModel {
   final Album? album;
   final int? duration;
   final int? year;
-  final List<Thumbnail> thumbnails;
+  final List<ThumbnailModel> thumbnails;
   final List<SearchModel> topSongs;
   final List<SearchModel> topAlbums;
   final List<SearchModel> topSingles;
@@ -23,12 +23,12 @@ class SearchModel {
   SearchModel({
     required this.type,
     required this.videoId,
-    required this.artistId,
-    required this.albumId,
-    required this.playlistId,
-    required this.name,
-    required this.artist,
-    required this.album,
+    this.artistId,
+    this.albumId,
+    this.playlistId,
+    this.name,
+    this.artist,
+    this.album,
     this.duration,
     this.year,
     this.thumbnails = const [],
@@ -77,7 +77,8 @@ class SearchModel {
       duration: map['duration'],
       year: map['year'],
       thumbnails: (map["thumbnails"] as List<dynamic>?)
-              ?.map((ele) => Thumbnail.fromMap(ele as Map<String, dynamic>))
+              ?.map(
+                  (ele) => ThumbnailModel.fromMap(ele as Map<String, dynamic>))
               .toList() ??
           [],
       topSongs: (map["topSongs"] as List<dynamic>?)
@@ -184,12 +185,12 @@ class Album {
       Album.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
-class Thumbnail {
+class ThumbnailModel {
   final String? url;
   final int? width;
   final int? height;
 
-  Thumbnail({
+  ThumbnailModel({
     required this.url,
     required this.width,
     required this.height,
@@ -203,8 +204,8 @@ class Thumbnail {
     };
   }
 
-  factory Thumbnail.fromMap(Map<String, dynamic> map) {
-    return Thumbnail(
+  factory ThumbnailModel.fromMap(Map<String, dynamic> map) {
+    return ThumbnailModel(
       url: map['url'] != null ? map['url'] as String : null,
       width: map['width'] != null ? map['width'] as int : null,
       height: map['height'] != null ? map['height'] as int : null,
@@ -213,6 +214,6 @@ class Thumbnail {
 
   String toJson() => json.encode(toMap());
 
-  factory Thumbnail.fromJson(String source) =>
-      Thumbnail.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory ThumbnailModel.fromJson(String source) =>
+      ThumbnailModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

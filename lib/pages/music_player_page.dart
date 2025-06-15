@@ -3,6 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_music_tech/components/horizontal_slider.dart';
+import 'package:the_music_tech/components/vertical_card.dart';
 import 'package:the_music_tech/core/models/models/search_model.dart';
 import 'package:the_music_tech/core/providers/my_provider.dart';
 import 'package:the_music_tech/core/services/shared_pref_service.dart';
@@ -26,7 +28,6 @@ class MusicPlayerPage extends StatefulWidget {
 }
 
 class _MusicPlayerPageState extends State<MusicPlayerPage> {
-  final YoutubeExplode _yt = YoutubeExplode();
   // bool isLoading = false;
   // late SearchModel music;
 
@@ -75,13 +76,15 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
   @override
   void dispose() {
     // _audioPlayer.dispose();
-    _yt.close();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final myProvider = Provider.of<MyProvider>(context);
+    final suggested = myProvider.suggested;
+
     final audioHandler = myProvider.audioHandler;
     final playlist = myProvider.playlist;
     final music = myProvider.currentMedia ?? widget.music;
@@ -110,9 +113,12 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
             actions: [
               IconButton(
                 onPressed: () async {
+                  if (newMedia == null) {
+                    return;
+                  }
                   if (isLikedMusic != null) {
-                    final newList = playlist
-                        .where((ele) => ele.videoId != newMedia?.videoId)
+                    final newList = myProvider.myPlayList
+                        .where((ele) => ele.videoId != newMedia.videoId)
                         .toList();
 
                     final updatedlist =
@@ -133,34 +139,26 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                     // }
                   } else {
                     final foundList = myProvider.myPlayList;
-                    if (newMedia != null) {
-                      if (context.mounted) {
-                        toastification.show(
-                          context: context,
-                          title: Text('Something went wrong'),
-                          autoCloseDuration: const Duration(seconds: 3),
-                          type: ToastificationType.error,
-                        );
-                      }
-                      return;
-                    }
-                    final list = [...foundList, newMedia!];
+                    final list = [...foundList, newMedia];
                     final savedList = list.map((ele) => ele.toMap()).toList();
+
                     myProvider.updateMyList(list);
 
                     await SharedPrefService.storeJsonArray(
                       "play_list",
                       savedList,
                     );
-                    // if (context.mounted) {
-                    //   toastification.show(
-                    //     context: context,
-                    //     title: Text('Added to playlist'),
-                    //     autoCloseDuration: const Duration(seconds: 5),
-                    //   );
-                    // }
+                    if (context.mounted) {
+                      toastification.show(
+                        context: context,
+                        title: Text('added to playlist'),
+                        autoCloseDuration: const Duration(seconds: 5),
+                      );
+                    }
                   }
                   myProvider.getMyPlayList();
+                  myProvider.addToSuggestedIdList(newMedia);
+                  myProvider.getSuggestedSongs(newMedia.videoId!);
                 },
                 icon: Icon(
                   FluentIcons.heart_12_filled,
@@ -220,6 +218,52 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                   ),
                 ),
                 const Spacer(),
+                HorizontalSlider(
+                  title: "Suggested For you",
+                  childrens: [
+                    ...List.generate(
+                      suggested.length,
+                      (i2) {
+                        final record2 = suggested[i2];
+
+                        return Stack(
+                          children: [
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: PopupMenuButton(
+                                itemBuilder: (context) {
+                                  return [
+                                    PopupMenuItem(
+                                      onTap: () {
+                                        myProvider.loadSingleItemInBackground(
+                                          record2,
+                                        );
+                                        if (context.mounted) {
+                                          toastification.show(
+                                            context: context,
+                                            title: Text('added to queue'),
+                                            autoCloseDuration:
+                                                const Duration(seconds: 5),
+                                          );
+                                        }
+                                      },
+                                      child: Text("add to queue"),
+                                    ),
+                                  ];
+                                },
+                              ),
+                            ),
+                            VerticalCard(
+                              item: record2,
+                              list: suggested,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
                 StreamBuilder<Duration?>(
                   stream: myProvider.durationStream,
                   builder: (context, durationSnapshot) {

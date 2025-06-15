@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // showPerformanceOverlay: true,
       home: HomeWrapper(),
       theme: ThemeData(
         primarySwatch: Colors.orange,

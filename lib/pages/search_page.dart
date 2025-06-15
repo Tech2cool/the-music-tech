@@ -253,7 +253,8 @@ class _SearchPageState extends State<SearchPage> {
                       trailing: PopupMenuButton(
                         itemBuilder: (context) {
                           return [
-                            if (song.type == 'SONG' || song.type == 'VIDEO')
+                            if (song.type == 'SONG' ||
+                                song.type == 'VIDEO') ...[
                               PopupMenuItem(
                                 onTap: () async {
                                   if (isLikedMusic != null) {
@@ -304,6 +305,23 @@ class _SearchPageState extends State<SearchPage> {
                                 },
                                 child: Text("Add To Playlist"),
                               ),
+                              PopupMenuItem(
+                                onTap: () {
+                                  myProvider.getSuggestedSongs(song.videoId!);
+                                  myProvider.addToSuggestedIdList(song);
+                                  if (context.mounted) {
+                                    toastification.show(
+                                      context: context,
+                                      title: Text(
+                                          'we will suggest more like this'),
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    );
+                                  }
+                                },
+                                child: Text("Suggest more"),
+                              ),
+                            ],
                           ];
                         },
                       ),

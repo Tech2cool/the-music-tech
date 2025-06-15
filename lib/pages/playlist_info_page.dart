@@ -196,7 +196,7 @@ class _PlayListInfoPageState extends State<PlayListInfoPage> {
                       } else {
                         myProvider.playlist = playlist;
                         myProvider.currentIndex = index;
-
+                        myProvider.currentPlayList = widget.music;
                         Navigator.push(
                           context,
                           MaterialPageRoute(

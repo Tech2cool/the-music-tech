@@ -51,16 +51,16 @@ class ApiService {
   Future<List<HomeSuggestion>> getHomeData() async {
     try {
       var url = '/home';
-      print('pass url');
+      // print('pass url');
       final Response response = await _dio.get(url);
-      print('pass resp');
+      // print('pass resp');
       final List<dynamic> data = response.data['data'];
-      print('pass list data');
+      // print('pass list data');
       final dataList = data.map((ele) => HomeSuggestion.fromMap(ele)).toList();
-      print('pass parsing data');
+      // print('pass parsing data');
       return dataList;
     } catch (e) {
-      print(e);
+      // print(e);
       return [];
     }
   }
@@ -70,19 +70,19 @@ class ApiService {
     String type = 'ALL',
   ]) async {
     try {
-      print('entered');
+      // print('entered');
       var url = '/search/$type?query=$query';
-      print('passed url');
+      // print('passed url');
       final Response response = await _dio.get(url);
-      print('passed response');
+      // print('passed response');
       final List<dynamic> data = response.data['data'];
-      print('passed data');
+      // print('passed data');
       final dataList = data.map((ele) => SearchModel.fromMap(ele)).toList();
-      print('passed parsing');
+      // print('passed parsing');
       return dataList;
     } catch (e, stackTrace) {
-      print(e);
-      print(stackTrace);
+      // print(e);
+      // print(stackTrace);
       return [];
     }
   }
