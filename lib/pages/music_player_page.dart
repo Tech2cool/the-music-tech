@@ -66,7 +66,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
 
         return;
       }
-      await myProvider.playAudioFromYouTube(videoId, music);
+      await myProvider.playNewSong(videoId, music);
     } catch (e) {
       //
     }
@@ -229,6 +229,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                           return VerticalCard(
                             item: record2,
                             list: suggested,
+                            replacePath: true,
                           );
                         },
                       ),

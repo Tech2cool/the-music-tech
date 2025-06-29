@@ -11,11 +11,13 @@ import 'package:the_music_tech/pages/playlist_info_page.dart';
 class VerticalCard extends StatelessWidget {
   final SearchModel item;
   final List<SearchModel> list;
+  final bool replacePath;
 
   const VerticalCard({
     super.key,
     required this.item,
     required this.list,
+    this.replacePath = false,
   });
 
   @override
@@ -59,14 +61,25 @@ class VerticalCard extends StatelessWidget {
         } else {
           myProvider.playlist = list;
           // myProvider.currentIndex = index;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MusicPlayerPage(
-                music: item,
+          if (replacePath) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MusicPlayerPage(
+                  music: item,
+                ),
               ),
-            ),
-          );
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MusicPlayerPage(
+                  music: item,
+                ),
+              ),
+            );
+          }
         }
       },
       child: Container(

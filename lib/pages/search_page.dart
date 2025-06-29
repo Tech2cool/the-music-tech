@@ -322,6 +322,22 @@ class _SearchPageState extends State<SearchPage> {
                                 child: Text("Suggest more"),
                               ),
                             ],
+                            if (song.type == 'PLAYLIST') ...[
+                              PopupMenuItem(
+                                onTap: () {
+                                  myProvider.addToSaveLaterPlayList(song);
+                                  if (context.mounted) {
+                                    toastification.show(
+                                      context: context,
+                                      title: Text('Playlist saved 💖'),
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    );
+                                  }
+                                },
+                                child: Text("Save for Later"),
+                              ),
+                            ],
                           ];
                         },
                       ),
