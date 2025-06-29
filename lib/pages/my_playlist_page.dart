@@ -36,6 +36,7 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
       await Future.wait([
         myProvider.getMyPlayList(),
         myProvider.getMyHistory(),
+        myProvider.getMySavedPlayList(),
       ]);
     } catch (e) {
       //
@@ -57,6 +58,7 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
     final currentPlaylist = myProvider.currentPlayList;
     final history = myProvider.history;
     final activePlaylist = myProvider.myPlayList;
+    final saveLaterPlaylist = myProvider.saveLaterPlayList;
 
     return Scaffold(
       appBar: AppBar(
@@ -126,9 +128,53 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                 ),
               ),
             ],
-            SizedBox(
-              height: 10,
+            SizedBox(height: 10),
+            HorizontalSlider(
+              title: "Saved Playlist 🎶",
+              headers: [
+                Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MyHistoryPage(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "See all",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.deepOrange.withAlpha(220),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 5),
+              ],
+              childrens: [
+                ...List.generate(saveLaterPlaylist.length, (i2) {
+                  final record2 = saveLaterPlaylist[i2];
+
+                  return VerticalCard(
+                    item: record2,
+                    list: saveLaterPlaylist,
+                  );
+                }),
+              ],
             ),
+            if (saveLaterPlaylist.isEmpty) ...[
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: const Text(
+                    "Listen music, it will be added here...",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+            SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.only(
                 left: 10.0,
@@ -138,7 +184,7 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "My Playlist",
+                    "Favourites 💖",
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                     ),

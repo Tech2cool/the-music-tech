@@ -11,15 +11,17 @@ import 'package:the_music_tech/pages/music_player_page.dart';
 import 'package:the_music_tech/pages/playlist_info_page.dart';
 import 'package:toastification/toastification.dart';
 
-class MySavedPlaylistPage extends StatefulWidget {
-  const MySavedPlaylistPage({super.key});
+class MySaveLaterPlaylistPage extends StatefulWidget {
+  const MySaveLaterPlaylistPage({super.key});
 
   @override
-  State<MySavedPlaylistPage> createState() => _MySavedPlaylistPageState();
+  State<MySaveLaterPlaylistPage> createState() =>
+      _MySaveLaterPlaylistPageState();
 }
 
-class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
+class _MySaveLaterPlaylistPageState extends State<MySaveLaterPlaylistPage> {
   final TextEditingController _controller = TextEditingController();
+  // List<SearchModel> _suggestions = [];
   Timer? _debounce;
   String query = "";
   bool isLoading = false;
@@ -34,7 +36,7 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
     try {
       //
       await Future.wait([
-        myProvider.getMyPlayList(),
+        myProvider.getMySavedPlayList(),
       ]);
     } catch (e) {
       //
@@ -66,7 +68,7 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
   @override
   Widget build(BuildContext context) {
     final myProvider = Provider.of<MyProvider>(context);
-    final playlist = myProvider.myPlayList.where((ele) {
+    final history = myProvider.saveLaterPlayList.where((ele) {
       final name = ele.name ?? "";
 
       return name.toLowerCase().contains(query);
@@ -74,7 +76,7 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Favourites 💖"),
+        title: const Text("Saved Playlist 🎶"),
       ),
       body: Column(
         children: [
@@ -112,52 +114,14 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
               ),
             ),
           ),
-          if (playlist.isNotEmpty) ...[
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 12.0,
-                right: 20,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Favourites 💖",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      myProvider.playlist = playlist;
-                      myProvider.currentIndex = 0;
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MusicPlayerPage(
-                            music: playlist[0],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Icon(
-                      Icons.play_circle,
-                      size: 25,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          if (playlist.isNotEmpty) ...[
+          if (history.isNotEmpty) ...[
             Expanded(
               child: RefreshIndicator(
                 onRefresh: onRefresh,
                 child: ListView.builder(
-                  itemCount: playlist.length,
+                  itemCount: history.length,
                   itemBuilder: (context, index) {
-                    final song = playlist[index];
+                    final song = history[index];
                     return ListTile(
                       // minVerticalPadding: 10,
                       contentPadding: const EdgeInsets.symmetric(
@@ -209,7 +173,7 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
                           return [
                             PopupMenuItem(
                               onTap: () async {
-                                final newList = playlist
+                                final newList = history
                                     .where((ele) => ele.videoId != song.videoId)
                                     .toList();
 
@@ -219,12 +183,12 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
                                 myProvider.updateMyList(newList);
 
                                 await SharedPrefService.storeJsonArray(
-                                  "play_list",
+                                  "history",
                                   updatedlist,
                                 );
                                 toastification.show(
                                   context: context,
-                                  title: Text('Remove from playlist'),
+                                  title: Text('Remove from History'),
                                   autoCloseDuration: const Duration(seconds: 5),
                                 );
                               },
@@ -262,7 +226,7 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
                             ),
                           );
                         } else {
-                          myProvider.playlist = playlist;
+                          myProvider.playlist = history;
                           myProvider.currentIndex = index;
                           Navigator.push(
                             context,
@@ -280,7 +244,7 @@ class _MySavedPlaylistPageState extends State<MySavedPlaylistPage> {
               ),
             ),
           ],
-          if (playlist.isEmpty) ...[
+          if (history.isEmpty) ...[
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
