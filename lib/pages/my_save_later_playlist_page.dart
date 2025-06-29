@@ -180,15 +180,15 @@ class _MySaveLaterPlaylistPageState extends State<MySaveLaterPlaylistPage> {
                                 final updatedlist =
                                     newList.map((ele) => ele.toMap()).toList();
 
-                                myProvider.updateMyList(newList);
+                                myProvider.updateMySaveLaterPlayList(newList);
 
                                 await SharedPrefService.storeJsonArray(
-                                  "history",
+                                  "save_later_playlist",
                                   updatedlist,
                                 );
                                 toastification.show(
                                   context: context,
-                                  title: Text('Remove from History'),
+                                  title: Text('Remove from list'),
                                   autoCloseDuration: const Duration(seconds: 5),
                                 );
                               },

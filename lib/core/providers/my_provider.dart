@@ -296,6 +296,12 @@ class MyProvider with ChangeNotifier {
     _debouncedNotify();
   }
 
+  void updateMySaveLaterPlayList(List<SearchModel> list) {
+    saveLaterPlayList = list;
+
+    _debouncedNotify();
+  }
+
   // Performance optimization: Enhanced history management
 
   Future<void> addToHistory([SearchModel? song]) async {
