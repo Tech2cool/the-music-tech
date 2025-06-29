@@ -9,6 +9,7 @@ import 'package:the_music_tech/pages/album_info_page.dart';
 import 'package:the_music_tech/pages/artist_info_page.dart';
 import 'package:the_music_tech/pages/music_player_page.dart';
 import 'package:the_music_tech/pages/my_history_page.dart';
+import 'package:the_music_tech/pages/my_save_later_playlist_page.dart';
 import 'package:the_music_tech/pages/my_saved_playlist_page.dart';
 import 'package:the_music_tech/pages/playlist_info_page.dart';
 import 'package:toastification/toastification.dart';
@@ -137,7 +138,7 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => MyHistoryPage(),
+                        builder: (context) => MySaveLaterPlaylistPage(),
                       ),
                     );
                   },
@@ -168,7 +169,7 @@ class _MyPlaylistPageState extends State<MyPlaylistPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: const Text(
-                    "Listen music, it will be added here...",
+                    "Save Later, the playlist it will be added here...",
                     textAlign: TextAlign.center,
                   ),
                 ),
