@@ -101,8 +101,13 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
   @override
   void dispose() {
     // _audioPlayer.dispose();
-
     super.dispose();
+    final myProvider = Provider.of<MyProvider>(
+      context,
+      listen: false,
+    );
+
+    myProvider.stopAllBackgroundLoading();
   }
 
   @override

@@ -230,7 +230,7 @@ class MyProvider with ChangeNotifier {
 
       // Clear playlist and related data
       // playlist.clear();
-      suggested.clear();
+      // suggested.clear();
       relatedVideos = null;
 
       // Clear cache if needed (optional - you might want to keep some cache)
@@ -238,9 +238,9 @@ class MyProvider with ChangeNotifier {
 
       _immediateNotify();
 
-      print('🔄 Audio player and playlist reset successfully');
+      // print('🔄 Audio player and playlist reset successfully');
     } catch (e) {
-      print('❌ Error resetting audio player: $e');
+      // print('❌ Error resetting audio player: $e');
     }
   }
 
@@ -259,7 +259,7 @@ class MyProvider with ChangeNotifier {
   void stopAllBackgroundLoading() {
     _isLoadingPlaylist = false;
     _isLoadingSuggested = false;
-    print('🛑 All background loading stopped');
+    // print('🛑 All background loading stopped');
     _debouncedNotify();
   }
 
@@ -615,7 +615,7 @@ class MyProvider with ChangeNotifier {
       for (int i = 0; i < filteredList.length; i += batchSize) {
         // Check if loading was cancelled
         if (!_isLoadingPlaylist) {
-          print('🛑 Background playlist loading cancelled');
+          // print('🛑 Background playlist loading cancelled');
           return;
         }
 
@@ -872,7 +872,7 @@ class MyProvider with ChangeNotifier {
 
       _debouncedNotify();
     } catch (e) {
-      print("Add to suggested IDs error: $e");
+      // print("Add to suggested IDs error: $e");
     }
   }
 
@@ -961,7 +961,7 @@ class MyProvider with ChangeNotifier {
         _debouncedNotify();
       }
     } catch (e) {
-      print('getSuggestedSongs error: $e');
+      // print('getSuggestedSongs error: $e');
     }
   }
 
