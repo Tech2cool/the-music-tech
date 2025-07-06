@@ -15,11 +15,13 @@ import 'package:collection/collection.dart';
 class MusicPlayerPage extends StatefulWidget {
   final SearchModel? music;
   final int index;
+  final bool isSameList;
 
   const MusicPlayerPage({
     super.key,
     this.music,
     this.index = 0,
+    this.isSameList = false,
   });
 
   @override
@@ -41,6 +43,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
       myProvider.currentMedia = widget.music;
     }
     final music = myProvider.currentMedia ?? widget.music;
+
     if (widget.music != null) {
       _playAudioFromYouTube(music?.videoId ?? "");
     }
@@ -66,7 +69,30 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
 
         return;
       }
-      await myProvider.playNewSong(videoId, music);
+
+      if (widget.isSameList == false) {
+        await myProvider.playNewSong(videoId, music);
+      } else {
+        //
+        final audioHandler = myProvider.audioHandler;
+        final playlist = myProvider.playlist;
+        final cItem = audioHandler.mediaItem;
+        // final cItem = audioHandler.mediaItem;
+        final newMedia =
+            playlist.firstWhereOrNull((ele) => ele.videoId == cItem.value?.id);
+        if (newMedia?.videoId == widget.music?.videoId) {
+          // skip
+          myProvider.stopAllBackgroundLoading();
+
+          return;
+        } else {
+          await myProvider.playAudioFromYouTube(
+            videoId,
+            music,
+            isNewSong: false,
+          );
+        }
+      }
     } catch (e) {
       //
     }

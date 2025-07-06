@@ -229,7 +229,7 @@ class MyProvider with ChangeNotifier {
       _currentMusic = null;
 
       // Clear playlist and related data
-      playlist.clear();
+      // playlist.clear();
       suggested.clear();
       relatedVideos = null;
 
@@ -260,6 +260,7 @@ class MyProvider with ChangeNotifier {
     _isLoadingPlaylist = false;
     _isLoadingSuggested = false;
     print('🛑 All background loading stopped');
+    _debouncedNotify();
   }
 
   // API calls with performance optimization

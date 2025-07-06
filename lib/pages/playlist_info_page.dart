@@ -194,13 +194,21 @@ class _PlayListInfoPageState extends State<PlayListInfoPage> {
                           ),
                         );
                       } else {
+                        bool sameList =
+                            myProvider.currentPlayList?.playlistId ==
+                                widget.music.playlistId;
+
                         myProvider.playlist = playlist;
                         myProvider.currentIndex = index;
                         myProvider.currentPlayList = widget.music;
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MusicPlayerPage(music: song),
+                            builder: (context) => MusicPlayerPage(
+                              music: song,
+                              isSameList: sameList,
+                            ),
                           ),
                         );
                       }
